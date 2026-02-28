@@ -1,4 +1,4 @@
-import type { Task } from "../types/types";
+import type { Task } from "../../types/types";
 import TaskCard from "./TaskCard";
 interface Props {
   title: string;

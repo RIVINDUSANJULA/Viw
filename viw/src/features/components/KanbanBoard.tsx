@@ -1,4 +1,4 @@
-import type { Task } from "../types/types"
+import type { Task } from "../../types/types"
 import Column from "./Column";
 
 interface Props {

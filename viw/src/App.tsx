@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import Projects from "./pages/Projects";
 import './App.css'
 import ProjectBoard from './pages/ProjectBoard';
@@ -9,8 +9,10 @@ function App() {
   return (
     <BrowserRouter>
     <Routes>
-      <Route path='/' element={<Projects />}/>
-      <Route path='/projects/:id' element={<ProjectBoard/>}/>
+      <Route path="/" element={<Navigate to="/projects" replace />} />
+      <Route path="/projects" element={<Projects />} />
+      <Route path="/board" element={<ProjectBoard />} />
+      {/* <Route path='/projects/:id' element={<ProjectBoard/>}/> */}
       <Route path="*" element={<NotFound/>} />
     </Routes>
     </BrowserRouter>

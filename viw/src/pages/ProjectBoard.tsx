@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom"
-import {projects} from "../components/Data";
+import {projects} from "../features/data/Data";
 import NotFound from "./notFound";
-import KanbanBoard from "../components/KanbanBoard";
+import KanbanBoard from "../features/components/KanbanBoard";
 // import Projects from "./Projects";
 // import KanbanBoard from "../components/KanbanBoard";
 
