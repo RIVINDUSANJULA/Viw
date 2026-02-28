@@ -1,4 +1,5 @@
 import type { Task } from "../types/types";
+import TaskCard from "./TaskCard";
 interface Props {
   title: string;
   status: Task["status"];
@@ -14,9 +15,7 @@ export default function Column({ status, tasks }: Props) {
         {filteredTasks.map(task => (
         <div>
             <br/>
-            {task.title}
-            <div>{task.status}</div>
-            {task.id}
+            <TaskCard key={task.id} task={task}/>
             
         </div>
         
