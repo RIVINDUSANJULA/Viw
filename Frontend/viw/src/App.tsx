@@ -1,11 +1,17 @@
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import Projects from "./pages/Projects";
 import './App.css'
+import ProjectBoard from './pages/ProjectBoard';
 
 function App() {
 
   return (
-    <>
-      <div className="bg-blue-500 text-green-500"><h1>AAA</h1></div>
-    </>
+    <BrowserRouter>
+    <Routes>
+      <Route path='/' element={<Projects />}/>
+      <Route path='/projects/:id' element={<ProjectBoard/>}/>
+    </Routes>
+    </BrowserRouter>
   )
 }
 
