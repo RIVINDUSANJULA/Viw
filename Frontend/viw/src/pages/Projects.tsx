@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import {projects}  from "../components/Data";
-import type { Key } from "react";
 // import type { Task } from "../types/types";
 
 // const projectList = data;
@@ -10,7 +9,7 @@ export default function Projects() {
     <div className="">
       <div className="text-3xl">Projects</div>
       <div>
-        {projects.map((x: { id: Key; name: string; description: string | undefined;}) => (
+        {projects.map((x) => (
           <Link
             key={x.id}
             to={`projects/${x.id}`}

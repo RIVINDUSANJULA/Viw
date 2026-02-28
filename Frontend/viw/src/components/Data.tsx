@@ -7,7 +7,7 @@ export const projects: Project[] = [
     description: "Building ML models",
     tasks: [
       { id: "t1", title: "Literature Review", status: "to-do" },
-      { id: "t2", title: "Review", status: "working" },
+      { id: "t2", title: "Revieweeeee", status: "working" },
     ],
   },
   {
