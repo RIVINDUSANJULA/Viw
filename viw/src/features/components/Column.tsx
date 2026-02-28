@@ -1,25 +1,26 @@
-import type { Task } from "../../types/types";
+import type { ColumnType, Task } from "../../types/types";
 import TaskCard from "./TaskCard";
 interface Props {
-  title: string;
-  status: Task["status"];
+  column: ColumnType;
   tasks: Task[];
+  onDragStart: (e: React.DragEvent, task: Task) => void;
+  onDrop: (e: React.DragEvent, columnId: string | number) => void;
+  onDragOver: (e: React.DragEvent) => void;
 }
 
-export default function Column({ status, tasks }: Props) {
-    const filteredTasks = tasks.filter(
-    task => task.status === status
-  );
+export default function Column({ column, tasks, onDragStart, onDrop, onDragOver }: Props) {
+
   return (
-    <div>
-        {filteredTasks.map(task => (
+    <div onDrop={(e) => onDrop(e, column.id)} onDragOver={onDragOver}>
+        <div>{column.title}</div>
+        <div>{tasks.length}</div>
         <div>
-            <br/>
-            <TaskCard key={task.id} task={task}/>
-            
+          
+          {tasks.map((task) => (
+            <TaskCard key={task.id} task={task} onDragStart={onDragStart} />
+          ))}
+
         </div>
-        
-      ))}
     </div>
   )
 }
