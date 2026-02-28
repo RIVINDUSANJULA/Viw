@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom"
 import {projects} from "../components/Data";
 import NotFound from "./notFound";
+import KanbanBoard from "../components/KanbanBoard";
 // import Projects from "./Projects";
 // import KanbanBoard from "../components/KanbanBoard";
 
@@ -17,12 +18,7 @@ export default function ProjectBoard() {
   return (
     <div>
       <h1>{project.name}</h1>
-      {project.tasks.map(task => (
-        <div key={task.id}>
-          <h3>{task.title}</h3>
-          <p>{task.status}</p>
-        </div>
-      ))}
+      <KanbanBoard tasks={project.tasks} />
     </div>
   )
 }
