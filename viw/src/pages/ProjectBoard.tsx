@@ -1,8 +1,6 @@
-// import NotFound from "./notFound";
-import KanbanBoard from "../features/components/KanbanBoard";
-
-import { useTenant } from "../context/TenantContext";
 import { useState } from "react";
+import KanbanBoard from "../features/components/KanbanBoard";
+import { useTenant } from "../context/TenantContext";
 import { createTask } from "../features/api/kanbanApi";
 import Modal from "../components/ui/Modal";
 
@@ -13,7 +11,7 @@ export default function ProjectBoard() {
   const [newTaskContent, setNewTaskContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  //FORCE Kanban - Refresh
+  // FORCE Kanban Refresh
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const handleCreateTask = async (e: React.FormEvent) => {
@@ -26,7 +24,7 @@ export default function ProjectBoard() {
       
       setNewTaskContent("");
       setIsModalOpen(false);
-      setRefreshTrigger(prev => prev + 1); // Tell the board to refetch
+      setRefreshTrigger(prev => prev + 1); // Tell the board to refetch tasks
     } catch (error) {
       console.error("Failed to create task:", error);
       alert("Error creating task. Check console.");
@@ -37,32 +35,30 @@ export default function ProjectBoard() {
   
   return (
     <div>
-      <div>
-        <div>
-          {activeTenant?.name}
-        </div>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-        >
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+        <h2>{activeTenant?.name || "Loading Workspace..."}</h2>
+        <button onClick={() => setIsModalOpen(true)}>
           Create Task
         </button>
       </div>
+
       <div>
         <KanbanBoard key={refreshTrigger} /> 
       </div>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create New Task">
         <form onSubmit={handleCreateTask}>
-          <div>
-            <label>Task Description</label>
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '5px' }}>Task Description</label>
             <textarea
+              style={{ width: '100%', minHeight: '80px' }}
               value={newTaskContent}
               onChange={(e) => setNewTaskContent(e.target.value)}
               placeholder="What needs to be done?"
               required
             />
           </div>
-          <div>
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
             <button 
               type="button" 
               onClick={() => setIsModalOpen(false)}
@@ -78,7 +74,6 @@ export default function ProjectBoard() {
           </div>
         </form>
       </Modal>
-      
     </div>
-  )
+  );
 }

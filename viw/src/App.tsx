@@ -3,7 +3,7 @@ import Projects from "./pages/Projects";
 import './App.css'
 import ProjectBoard from './pages/ProjectBoard';
 import NotFound from "./pages/notFound";
-import { TenantProvider } from './context/TenantContext';
+import { TenantProvider, useTenant } from './context/TenantContext';
 import AppLayout from './components/layout/AppLayout';
 import AuthProvider, { useAuth } from './context/AuthContext';
 import Login from './pages/Login';
@@ -11,21 +11,26 @@ import Register from './pages/Register';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
+
+  const { activeTenant, isLoading: tenantLoading } = useTenant();
   
-  if (loading) return <div >Loading...</div>;
+  if (loading || tenantLoading) return <div>Loading...</div>;
+
   if (!user) return <Navigate to="/login" replace />;
+  if (!activeTenant) return <Navigate to="/register" replace />;
   
   return <>{children}</>;
 }
 
 export default function App() {
 
+
   return (
     <AuthProvider>
       <TenantProvider>
         <BrowserRouter>
           <Routes>
-            {/* Public Route */}
+            {/* Public / Unprotected Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 

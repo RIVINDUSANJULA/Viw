@@ -35,66 +35,35 @@ export const updateTaskColumn = async (taskId: string | number, newColumnId: str
 export const createTask = async (tenantId: string, columnId: string | number, content: string) => {
   
 
-  const { data: tenantCheck, error: tenantError } = await supabase
-    .from('tenants')
-    .select('id')
-    .eq('id', tenantId)
-    .maybeSingle();
-
-  if (tenantError) throw tenantError;
-
-  if (!tenantCheck) {
-    console.log("Tenant missing. Auto-creating tenant record...");
-    const { error: insertTenantError } = await supabase
-      .from('tenants')
-      .insert([{ id: tenantId, name: 'Auto-Generated Workspace' }]);
-    
-    if (insertTenantError) throw new Error(`Failed to create tenant: ${insertTenantError.message}`);
-  }
-
-  const { data: existingProject, error: projectError } = await supabase
+  const { data: project } = await supabase
     .from('projects')
     .select('id')
     .eq('tenant_id', tenantId)
-    .limit(1)
     .maybeSingle();
 
-  if (projectError) throw new Error("Could not find an active project for this workspace.");
+  let projectId = project?.id;
 
-  let finalProjectId = existingProject?.id;
-
-  if (!finalProjectId) {
-    console.log("No project found. Auto-creating 'Main Board'...");
-    const { data: newProject, error: insertProjectError } = await supabase
+  if (!projectId) {
+    const { data: newProj } = await supabase
       .from('projects')
-      .insert([{ 
-        name: 'Main Board', 
-        tenant_id: tenantId 
-      }])
-      .select('id')
+      .insert([{ name: 'Main Board', tenant_id: tenantId }])
+      .select()
       .single();
-
-    if (insertProjectError) {
-      console.error("SUPABASE DETAILED ERROR:", insertProjectError);
-      throw new Error(`Database Error: ${insertProjectError.message}`);
-    }
-    
-    finalProjectId = newProject.id; 
+    projectId = newProj.id;
   }
 
-  //NEW TASK
-  const { data: newTask, error: taskError } = await supabase
+  const { data, error } = await supabase
     .from('tasks')
     .insert([{
-        tenant_id: tenantId,
-        project_id: finalProjectId,
-        column_id: columnId,
-        title: content,
-        position_index: 0
-      }])
+      tenant_id: tenantId,
+      project_id: projectId,
+      column_id: columnId,
+      title: content,
+      position_index: 0
+    }])
     .select()
-    .maybeSingle();
+    .single();
 
-  if (taskError) throw taskError;
-  return newTask as Task;
+  if (error) throw error;
+  return data as Task;
 };

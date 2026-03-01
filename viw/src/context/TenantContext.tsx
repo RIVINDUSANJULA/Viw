@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { supabase } from "../lib/supabase";
 
 
 interface Tenant {
@@ -9,6 +10,7 @@ interface Tenant {
 interface TenantContextType {
   activeTenant: Tenant | null;
   setActiveTenant: (tenant: Tenant) => void;
+  isLoading: boolean;
 }
 
 //BELOW ONE EXPLAIN
@@ -19,16 +21,46 @@ const TenantContext = createContext<TenantContextType | undefined>(undefined);
 
 export function TenantProvider({ children }: { children: ReactNode }) {
 
-  // Hardcoded default for now. Later, this comes from a login API.
-  // Work After Login API - Rivindu
-  const [activeTenant, setActiveTenant] = useState<Tenant | null>({
-    id: "4fa8f3b8-18c3-4bad-b73c-9aa88b260309",
-    name: "Engineering Workspace"
-  });
+  const [activeTenant, setActiveTenant] = useState<Tenant | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchInitialTenant() {
+      try {
+        const { data, error } = await supabase
+          .from('tenants')
+          .select('*')
+          .limit(1)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Error fetching tenant from Supabase:", error.message);
+          return;
+        }
+
+        else if (data) {
+          setActiveTenant({
+            id: data.id,
+            name: data.name
+          });
+        }
+      } catch (err) {
+        console.error("Unexpected error fetching tenant:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchInitialTenant();
+  }, []);
 
   return (
-    <TenantContext.Provider value={{ activeTenant, setActiveTenant }}>
-      {children}
+    <TenantContext.Provider value={{ activeTenant, setActiveTenant, isLoading }}>
+      {isLoading ? (
+        <div>Loading Workspace Data...</div>
+        ) : (
+          children
+        )}
     </TenantContext.Provider>
   );
 }
