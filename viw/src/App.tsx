@@ -7,6 +7,7 @@ import { TenantProvider } from './context/TenantContext';
 import AppLayout from './components/layout/AppLayout';
 import AuthProvider, { useAuth } from './context/AuthContext';
 import Login from './pages/Login';
+import Register from './pages/Register';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -26,6 +27,7 @@ export default function App() {
           <Routes>
             {/* Public Route */}
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
             {/* Protected Routes inside the Layout */}
             <Route path="/" element={
