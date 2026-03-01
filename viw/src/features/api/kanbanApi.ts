@@ -33,6 +33,25 @@ export const updateTaskColumn = async (taskId: string | number, newColumnId: str
 
 
 export const createTask = async (tenantId: string, columnId: string | number, content: string) => {
+  
+
+  const { data: tenantCheck, error: tenantError } = await supabase
+    .from('tenants')
+    .select('id')
+    .eq('id', tenantId)
+    .maybeSingle();
+
+  if (tenantError) throw tenantError;
+
+  if (!tenantCheck) {
+    console.log("Tenant missing. Auto-creating tenant record...");
+    const { error: insertTenantError } = await supabase
+      .from('tenants')
+      .insert([{ id: tenantId, name: 'Auto-Generated Workspace' }]);
+    
+    if (insertTenantError) throw new Error(`Failed to create tenant: ${insertTenantError.message}`);
+  }
+
   const { data: existingProject, error: projectError } = await supabase
     .from('projects')
     .select('id')
