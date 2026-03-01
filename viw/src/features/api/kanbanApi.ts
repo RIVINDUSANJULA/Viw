@@ -86,17 +86,12 @@ export const createTask = async (tenantId: string, columnId: string | number, co
   const { data: newTask, error: taskError } = await supabase
     .from('tasks')
     .insert([{
-      tenant_id: tenantId,
-      project_id: finalProjectId,
-      column_id: columnId,
-      content: content,
-      
-      // DEMO CHANGE PLEASE - RIVINDU
-      title: "New Task", 
-      
-      
-      position_index: 0
-    }])
+        tenant_id: tenantId,
+        project_id: finalProjectId,
+        column_id: columnId,
+        title: content,
+        position_index: 0
+      }])
     .select()
     .maybeSingle();
 
