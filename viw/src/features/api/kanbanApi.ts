@@ -33,7 +33,7 @@ export const updateTaskColumn = async (taskId: string | number, newColumnId: str
 
 
 export const createTask = async (tenantId: string, columnId: string | number, content: string) => {
-  const { data: projectData, error: projectError } = await supabase
+  const { data: existingProject, error: projectError } = await supabase
     .from('projects')
     .select('id')
     .eq('tenant_id', tenantId)
@@ -42,12 +42,54 @@ export const createTask = async (tenantId: string, columnId: string | number, co
 
   if (projectError) throw new Error("Could not find an active project for this workspace.");
 
+  let finalProjectId = existingProject?.id;
+
+  if (!finalProjectId) {
+    console.log("No project found. Auto-creating 'Main Board'...");
+    const { data: newProject, error: insertProjectError } = await supabase
+      .from('projects')
+      .insert([{ 
+        name: 'Main Board', 
+        tenant_id: tenantId 
+      }])
+      .select('id')
+      .single();
+
+    if (insertProjectError) throw new Error("Failed to auto-create project.");
+    
+    finalProjectId = newProject.id; 
+  }
+
+
+  if (!finalProjectId) {
+    console.log("No project found. Auto-creating 'Main Board'...");
+
+
+    const { data: newProject, error: insertProjectError } = await supabase
+      .from('projects')
+      .insert([{ 
+        name: 'Main Board', 
+        tenant_id: tenantId 
+      }])
+      .select('id')
+      .single();
+
+      
+    if (insertProjectError) throw new Error("Failed to auto-create project.");
+    
+
+
+    finalProjectId = newProject.id;
+  }
+
+  if (!finalProjectId) throw new Error("Could not resolve a project ID.");
+
   //NEW TASK
   const { data: newTask, error: taskError } = await supabase
     .from('tasks')
     .insert([{
       tenant_id: tenantId,
-      project_id: projectData.id,
+      project_id: finalProjectId,
       column_id: columnId,
       content: content,
       
