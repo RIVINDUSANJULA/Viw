@@ -12,14 +12,24 @@ export const registerAndCreateWorkspace = async (email: string, password: string
   const user = authData.user;
   if (!user) throw new Error("Failed to create user account.");
 
-  //Reg Workplace
+  
+
+  const { data: sessionData } = await supabase.auth.getSession();
+  if (!sessionData.session) {
+    throw new Error("Session not established. Go to Supabase -> Authentication -> Providers -> Email, and turn OFF 'Confirm email'.");
+  }
+
+
+  // Tenant
   const { data: tenantData, error: tenantError } = await supabase
     .from('tenants')
     .insert([{ name: workspaceName }])
     .select()
     .single();
 
-  if (tenantError) throw tenantError;
+  if (tenantError) throw new Error(`Tenant DB Error: ${tenantError.message}`);
+
+
 
   //User LINK - Workplace (ADMIN)
   
@@ -33,20 +43,6 @@ export const registerAndCreateWorkspace = async (email: string, password: string
     }]);
 
   if (linkError) throw linkError;
-
-  //Testing Data
-  const { data: projectData, error: projectError } = await supabase
-    .from('projects')
-    .insert([{ tenant_id: tenantData.id, name: "First Project", description: "Default project" }])
-    .select().single();
-
-  if (!projectError && projectData) {
-      await supabase.from('board_columns').insert([
-        { tenant_id: tenantData.id, project_id: projectData.id, title: "To Do", position_index: 0 },
-        { tenant_id: tenantData.id, project_id: projectData.id, title: "In Progress", position_index: 1 },
-        { tenant_id: tenantData.id, project_id: projectData.id, title: "Done", position_index: 2 }
-      ]);
-  }
 
   return tenantData;
 };

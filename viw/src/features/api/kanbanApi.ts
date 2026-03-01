@@ -55,34 +55,13 @@ export const createTask = async (tenantId: string, columnId: string | number, co
       .select('id')
       .single();
 
-    if (insertProjectError) throw new Error("Failed to auto-create project.");
+    if (insertProjectError) {
+      console.error("SUPABASE DETAILED ERROR:", insertProjectError);
+      throw new Error(`Database Error: ${insertProjectError.message}`);
+    }
     
     finalProjectId = newProject.id; 
   }
-
-
-  if (!finalProjectId) {
-    console.log("No project found. Auto-creating 'Main Board'...");
-
-
-    const { data: newProject, error: insertProjectError } = await supabase
-      .from('projects')
-      .insert([{ 
-        name: 'Main Board', 
-        tenant_id: tenantId 
-      }])
-      .select('id')
-      .single();
-
-      
-    if (insertProjectError) throw new Error("Failed to auto-create project.");
-    
-
-
-    finalProjectId = newProject.id;
-  }
-
-  if (!finalProjectId) throw new Error("Could not resolve a project ID.");
 
   //NEW TASK
   const { data: newTask, error: taskError } = await supabase
