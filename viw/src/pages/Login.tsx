@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
 export default function Login() {
@@ -60,6 +60,9 @@ export default function Login() {
                     {loading ? "Signing in..." : "Sign In"}
                 </button>
                 </form>
+                <div>
+                    <Link to="/register">Create - workspace</Link>
+                </div>
         </div>
     </div>
   )
