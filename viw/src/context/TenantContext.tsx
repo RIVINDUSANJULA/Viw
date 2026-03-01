@@ -22,7 +22,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
   // Hardcoded default for now. Later, this comes from a login API.
   // Work After Login API - Rivindu
   const [activeTenant, setActiveTenant] = useState<Tenant | null>({
-    id: "tenant_123",
+    id: "4fa8f3b8-18c3-4bad-b73c-9aa88b260309",
     name: "Engineering Workspace"
   });
 

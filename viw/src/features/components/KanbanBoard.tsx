@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 import { useTenant } from "../../context/TenantContext";
 import { fetchColumns, fetchTasks, updateTaskColumn } from "../api/kanbanApi";
+import { supabase } from "../../lib/supabase";
 
 
 export default function KanbanBoard() {
@@ -38,6 +39,33 @@ export default function KanbanBoard() {
     };
 
     loadBoardData();
+
+
+
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // LISTENING - INSERT, UPDATE, and DELETE
+          schema: 'public',
+          table: 'tasks',
+          filter: `tenant_id=eq.${activeTenant.id}`, // Only listen - this workspace!
+        },
+        (payload) => {
+          console.log("Real-time update : ", payload);
+          loadBoardData(); 
+        }
+      )
+      .subscribe();
+
+    // Clean - subscription <-- user leaves - page
+    return () => {
+      supabase.removeChannel(channel);
+    };
+
+
+    
   }, [activeTenant]);
 
 
