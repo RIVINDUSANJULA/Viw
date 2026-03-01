@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 
 import { type User, type Session } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
-import { error } from 'console';
 
 interface AuthContextType {
   user: User | null;
@@ -21,9 +20,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
-            if (error) {
-                console.error("Error fetching session:", error.message);
-            }
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
