@@ -46,10 +46,9 @@ export const registerAndCreateWorkspace = async (email: string, password: string
 
 
   const defaultColumns = [
-    { name: 'To Do', position_index: 0, tenant_id: tenantData.id },
-    { name: 'In Progress', position_index: 1, tenant_id: tenantData.id },
-    { name: 'Done', position_index: 2, tenant_id: tenantData.id }
-  ];
+    { id: 'todo', title: 'To Do', position_index: 0, tenant_id: tenantData.id },
+    { id: 'in-progress', title: 'In Progress', position_index: 1, tenant_id: tenantData.id },
+    { id: 'done', title: 'Done', position_index: 2, tenant_id: tenantData.id }];
 
   const { error: columnError } = await supabase
     .from('board_columns')

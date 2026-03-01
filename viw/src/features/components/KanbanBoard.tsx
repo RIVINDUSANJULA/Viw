@@ -72,7 +72,7 @@ export default function KanbanBoard() {
   
 
   const handleDragStart = (e: React.DragEvent, task: Task) => {
-    e.dataTransfer.setData("taskId", task.id.toString());
+    e.dataTransfer.setData("taskId", task.id);
   };
 
   const handleDrop = async (e: React.DragEvent, columnId: string | number) => {
@@ -112,7 +112,7 @@ export default function KanbanBoard() {
         <Column
           key={col.id}
           column={col}
-          tasks={tasks.filter((task) => task.columnId === col.id)}
+          tasks={tasks.filter((task) => task.column_id === col.id)}
           onDragStart={handleDragStart}
           onDrop={handleDrop}
           onDragOver={handleDragOver}

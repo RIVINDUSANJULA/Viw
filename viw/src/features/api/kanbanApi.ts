@@ -35,35 +35,69 @@ export const updateTaskColumn = async (taskId: string | number, newColumnId: str
 export const createTask = async (tenantId: string, columnId: string | number, content: string) => {
   
 
-  const { data: project } = await supabase
+  const { data: tenantCheck } = await supabase
     .from('projects')
     .select('id')
     .eq('tenant_id', tenantId)
     .maybeSingle();
 
-  let projectId = project?.id;
-
-  if (!projectId) {
-    const { data: newProj } = await supabase
-      .from('projects')
-      .insert([{ name: 'Main Board', tenant_id: tenantId }])
-      .select()
-      .single();
-    projectId = newProj.id;
+  if (!tenantCheck) {
+    console.log("Tenant missing. Auto-creating tenant record...");
+    await supabase.from('tenants').insert([{ id: tenantId, name: 'Auto-Generated Workspace' }]);
   }
 
-  const { data, error } = await supabase
+  const { data: existingProject } = await supabase
+    .from('projects')
+    .select('id')
+    .eq('tenant_id', tenantId)
+    .limit(1)
+    .maybeSingle();
+
+  let finalProjectId = existingProject?.id;
+
+  if (!finalProjectId) {
+    console.log("No project found. Auto-creating 'Main Board'...");
+    const { data: newProject, error: insertProjectError } = await supabase
+      .from('projects')
+      .insert([{ name: 'Main Board', tenant_id: tenantId }])
+      .select('id')
+      .single();
+
+    if (insertProjectError) throw new Error(`Database Error: ${insertProjectError.message}`);
+    finalProjectId = newProject.id; 
+  }
+
+  const { data: columnCheck } = await supabase
+    .from('board_columns')
+    .select('id')
+    .eq('id', columnId)
+    .maybeSingle();
+
+  if (!columnCheck) {
+    console.log(`Column '${columnId}' missing. Auto-creating default board columns...`);
+    const { error: colError } = await supabase
+      .from('board_columns')
+      .insert([
+        { id: 'todo', tenant_id: tenantId, title: 'To Do', position_index: 0 },
+        { id: 'in-progress', tenant_id: tenantId, title: 'In Progress', position_index: 1 },
+        { id: 'done', tenant_id: tenantId, title: 'Done', position_index: 2 }
+      ]);
+      
+    if (colError) console.error("Failed to seed default columns:", colError);
+  }
+
+  const { data: newTask, error: taskError } = await supabase
     .from('tasks')
     .insert([{
-      tenant_id: tenantId,
-      project_id: projectId,
-      column_id: columnId,
-      title: content,
-      position_index: 0
-    }])
+        tenant_id: tenantId,
+        project_id: finalProjectId,
+        column_id: columnId,
+        title: content,
+        position_index: 0
+      }])
     .select()
     .single();
 
-  if (error) throw error;
-  return data as Task;
+  if (taskError) throw taskError;
+  return newTask as Task;
 };

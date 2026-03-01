@@ -6,18 +6,21 @@ export interface Project {
 }
 export interface Task {
   id: string;
-  // title: string;
-  // status: "to-do" | "working" | "completed";
-
-  // columnId: Id;
-  columnId: string | number;
-  content: string;
+  tenant_id: string;
+  project_id: string;
+  column_id: string;
+  title: string;  // Changed from 'content' to match SQL
+  position_index: number;
 }
 
 export type Id = string;
+
+
 export interface Column {
-  id: Id;
+  id: string;
+  tenant_id: string;
   title: string;
+  position_index: number;
 }
 
 export interface ColumnType {

@@ -9,7 +9,7 @@ export default function TaskCard({ task, onDragStart }: Props) {
   return (
     <div draggable onDragStart={(e) => onDragStart(e, task)} >
       <div>
-        {task.id}{task.content}
+        {task.title}
       </div>
     </div>
   )
