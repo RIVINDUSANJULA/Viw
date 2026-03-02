@@ -25,25 +25,41 @@ export function TenantProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchInitialTenant() {
+    async function fetchUserWorkspace() {
       try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = session?.user;
+
+        if (!user) {
+          console.log("No user is logged in.");
+          setIsLoading(false);
+          return;
+        }
+
         const { data, error } = await supabase
-          .from('tenants')
-          .select('*')
+          .from('tenant_users')
+          .select(`
+            tenant_id,
+            tenants ( id, name )
+          `)
+          .eq('user_id', user.id)
           .limit(1)
           .maybeSingle();
 
         if (error) {
-          console.error("Error fetching tenant from Supabase:", error.message);
-          return;
+          console.error("Error fetching user workspace:", error.message);
+        } else if (data && data.tenants) {
+          // Supabase joins can sometimes return arrays depending on schema, so we handle both safely
+          const tenantData = Array.isArray(data.tenants) ? data.tenants[0] : data.tenants;
+          
+          if (tenantData) {
+            setActiveTenant({
+              id: tenantData.id,
+              name: tenantData.name
+            });
+          }
         }
 
-        else if (data) {
-          setActiveTenant({
-            id: data.id,
-            name: data.name
-          });
-        }
       } catch (err) {
         console.error("Unexpected error fetching tenant:", err);
       } finally {
@@ -51,7 +67,22 @@ export function TenantProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    fetchInitialTenant();
+    fetchUserWorkspace();
+
+    //Log OR Not - Instant Update
+    const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN') {
+        setIsLoading(true);
+        fetchUserWorkspace();
+      } else if (event === 'SIGNED_OUT') {
+        setActiveTenant(null);
+      }
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+
   }, []);
 
   return (
