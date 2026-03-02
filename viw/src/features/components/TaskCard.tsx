@@ -7,8 +7,8 @@ interface Props {
 }
 export default function TaskCard({ task, onDragStart }: Props) {
   return (
-    <div draggable onDragStart={(e) => onDragStart(e, task)} >
-      <div>
+    <div draggable onDragStart={(e) => onDragStart(e, task)} className="cursor-grab">
+      <div className="whitespace-pre-wrap">
         {task.title}
       </div>
     </div>

@@ -26,4 +26,8 @@ export interface Column {
 export interface ColumnType {
   id: string | number;
   title: string;
+
+  
+  tenant_id: string;
+  position_index: number;
 }

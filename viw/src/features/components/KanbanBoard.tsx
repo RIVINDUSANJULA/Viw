@@ -3,11 +3,9 @@ import Column from "./Column";
 
 import { useEffect, useState } from "react";
 
-//import { defaultCols, defaultTasks } from "../data/constants"; - Remove With New Supabase Algo
 
 import { useTenant } from "../../context/TenantContext";
 import { fetchColumns, fetchTasks, updateTaskColumn } from "../api/kanbanApi";
-import { supabase } from "../../lib/supabase";
 
 
 export default function KanbanBoard() {
@@ -39,33 +37,6 @@ export default function KanbanBoard() {
     };
 
     loadBoardData();
-
-
-
-    const channel = supabase
-      .channel('schema-db-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*', // LISTENING - INSERT, UPDATE, and DELETE
-          schema: 'public',
-          table: 'tasks',
-          filter: `tenant_id=eq.${activeTenant.id}`, // Only listen - this workspace!
-        },
-        (payload) => {
-          console.log("Real-time update : ", payload);
-          loadBoardData(); 
-        }
-      )
-      .subscribe();
-
-    // Clean - subscription <-- user leaves - page
-    return () => {
-      supabase.removeChannel(channel);
-    };
-
-
-    
   }, [activeTenant]);
 
 
@@ -75,35 +46,55 @@ export default function KanbanBoard() {
     e.dataTransfer.setData("taskId", task.id);
   };
 
-  const handleDrop = async (e: React.DragEvent, columnId: string | number) => {
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault(); 
+    e.dataTransfer.dropEffect = "move"; 
+  };
+
+
+
+  const handleDrop = async (e: React.DragEvent, columnId: string) => {
     e.preventDefault();
     const taskId = e.dataTransfer.getData("taskId");
+    if (!taskId) return;
     
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
-        task.id === taskId ? { ...task, columnId: String(columnId) } : task
+        task.id === taskId ? { ...task, column_id: columnId } : task
       )
     );
 
 
     //Supabase
-    try {
-      await updateTaskColumn(taskId, columnId);
+    const performUpdate = async () => {
+      try {
+        await updateTaskColumn(taskId, columnId);
     } catch (error) {
-      console.error("Failed to update task in database:", error);
+        console.error("Failed to update task in database:", error);
+        alert("Failed to move task. Reverting...");}
+
+      if (activeTenant) {
+        const refreshedTasks = await fetchTasks(activeTenant.id);
+        setTasks(refreshedTasks);
+      }
+
+
     }
 
 
-  };
+    performUpdate();
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault(); 
+
   };
 
   //Supabase - Just added a Loading
   if (loading) {
     return <div>Loading board...</div>;
   }
+
+
+  if (!columns.length) return <div>No columns found.</div>;
 
 
   return (

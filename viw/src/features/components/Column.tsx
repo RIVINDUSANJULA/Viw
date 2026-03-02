@@ -4,7 +4,7 @@ interface Props {
   column: ColumnType;
   tasks: Task[];
   onDragStart: (e: React.DragEvent, task: Task) => void;
-  onDrop: (e: React.DragEvent, columnId: string | number) => void;
+  onDrop: (e: React.DragEvent, columnId: string) => void;
   onDragOver: (e: React.DragEvent) => void;
 }
 
