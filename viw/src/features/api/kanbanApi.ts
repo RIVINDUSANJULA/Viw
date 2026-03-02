@@ -101,3 +101,17 @@ export const createTask = async (tenantId: string, columnId: string | number, co
   if (taskError) throw taskError;
   return newTask as Task;
 };
+
+
+
+
+
+
+export const deleteTask = async (taskId: string) => {
+  const { error } = await supabase
+    .from('tasks')
+    .delete()
+    .eq('id', taskId);
+
+  if (error) throw error;
+};

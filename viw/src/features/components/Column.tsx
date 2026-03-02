@@ -6,9 +6,10 @@ interface Props {
   onDragStart: (e: React.DragEvent, task: Task) => void;
   onDrop: (e: React.DragEvent, columnId: string) => void;
   onDragOver: (e: React.DragEvent) => void;
+  onDelete: (taskId: string) => void;
 }
 
-export default function Column({ column, tasks, onDragStart, onDrop, onDragOver }: Props) {
+export default function Column({ column, tasks, onDragStart, onDrop, onDragOver, onDelete }: Props) {
 
   return (
     <div onDrop={(e) => onDrop(e, column.id)} onDragOver={onDragOver}>
@@ -17,7 +18,7 @@ export default function Column({ column, tasks, onDragStart, onDrop, onDragOver 
         <div>
           
           {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} onDragStart={onDragStart} />
+            <TaskCard key={task.id} task={task} onDragStart={onDragStart} onDelete={onDelete} />
           ))}
 
         </div>

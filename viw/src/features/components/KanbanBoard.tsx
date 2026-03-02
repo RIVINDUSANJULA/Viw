@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 
 import { useTenant } from "../../context/TenantContext";
-import { fetchColumns, fetchTasks, updateTaskColumn } from "../api/kanbanApi";
+import { deleteTask, fetchColumns, fetchTasks, updateTaskColumn } from "../api/kanbanApi";
 
 
 export default function KanbanBoard() {
@@ -88,6 +88,28 @@ export default function KanbanBoard() {
 
   };
 
+
+
+  const handleDelete = async (taskId: string) => {
+    if (!window.confirm("Are you sure you want to delete this task?")) return;
+
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+
+    try {
+      await deleteTask(taskId);
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+      alert("Failed to delete task. Reverting...");
+      
+      if (activeTenant) {
+        const refreshedTasks = await fetchTasks(activeTenant.id);
+        setTasks(refreshedTasks);
+      }
+    }
+  };
+
+
+
   //Supabase - Just added a Loading
   if (loading) {
     return <div>Loading board...</div>;
@@ -107,6 +129,7 @@ export default function KanbanBoard() {
           onDragStart={handleDragStart}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
+          onDelete={handleDelete}
         />
       ))}
     </div>
