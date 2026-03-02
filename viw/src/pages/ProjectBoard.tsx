@@ -4,6 +4,7 @@ import { useTenant } from "../context/TenantContext";
 import { createTask } from "../features/api/kanbanApi";
 import Modal from "../components/ui/Modal";
 import { supabase } from "../lib/supabase";
+import InviteTeamModal from "../components/ui/InviteTeamModal";
 
 export default function ProjectBoard() {
   const { activeTenant } = useTenant();
@@ -14,6 +15,9 @@ export default function ProjectBoard() {
 
   // FORCE Kanban Refresh
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false); // <-- NEW STATE
+  
 
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,6 +49,9 @@ export default function ProjectBoard() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
         <h2>{activeTenant?.name || "Loading Workspace..."}</h2>
+        <button onClick={() => setIsInviteModalOpen(true)}>
+            Invite Member
+        </button>
         <button onClick={() => setIsModalOpen(true)}>
           Create Task
         </button>
@@ -82,6 +89,10 @@ export default function ProjectBoard() {
           </div>
         </form>
       </Modal>
+      <InviteTeamModal 
+        isOpen={isInviteModalOpen} 
+        onClose={() => setIsInviteModalOpen(false)} 
+      />
       <div>
         <button onClick={handleLogout}>
           Logout

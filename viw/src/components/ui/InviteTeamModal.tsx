@@ -1,51 +1,54 @@
 import { useState } from "react";
 import Modal from "./Modal";
-import { supabase } from "../../lib/supabase";
+// import { supabase } from "../../lib/supabase";
 import { useTenant } from "../../context/TenantContext";
+import { inviteUserToWorkspace } from "../../features/api/kanbanApi";
 
-interface InviteData {
-  email: string;
-  role: 'admin' | 'member';
-}
+// interface Props {
+//   isOpen: boolean;
+//   onClose: () => void;
+// }
 
 export default function InviteTeamModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { activeTenant } = useTenant();
-  const [formData, setFormData] = useState<InviteData>({ email: "", role: "member" });
+//   const [formData, setFormData] = useState<InviteData>({ email: "", role: "member" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+
+  const [email, setEmail] = useState("");
+  const [success, setSuccess] = useState<string | null>(null);
+
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!activeTenant) return;
+    if (!activeTenant || !email.trim()) return;
 
     setIsSubmitting(true);
     setError(null);
+    setSuccess(null);
 
     try {
-      // Logic to invite user (usually involves inserting into tenant_users)
-      const { error: inviteError } = await supabase
-        .from('tenant_users')
-        .insert([
-          { 
-            tenant_id: activeTenant.id, 
-            email: formData.email, // Note: You'll need to map this to a user_id later
-            role: formData.role 
-          }
-        ]);
-
-      if (inviteError) throw inviteError;
+      await inviteUserToWorkspace(activeTenant.id, email);
+      
+      setSuccess("User successfully added to workspace!");
+      setEmail("");
+      
+      setTimeout(() => {
+        setSuccess(null);
+        onClose();
+      }, 1500);
       
       onClose();
-      setFormData({ email: "", role: "member" });
+    //   setFormData({ email: "", role: "member" });
     } catch (err: unknown) { 
       if (err instanceof Error) {
-        setErrorMessage(err.message);
+        setError(err.message);
       } 
       else if (typeof err === 'object' && err !== null && 'message' in err) {
-        setErrorMessage(String((err as { message: string }).message));
+        setError(String((err as { message: string }).message));
       } 
       else {
-        setErrorMessage("An unexpected error occurred");
+        setError("An unexpected error occurred");
       }
     } finally {
       setIsSubmitting(false);
@@ -55,37 +58,28 @@ export default function InviteTeamModal({ isOpen, onClose }: { isOpen: boolean; 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Invite Team Member">
       <form onSubmit={handleInvite}>
-        {error && <div>{error}</div>}
         
+        {error && <div>{error}</div>}
+        {success && <div>{success}</div>}
+
         <div>
-          <label>Email Address</label>
+          <label>User's Email Address</label>
           <input
             type="email"
             required
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            placeholder="colleague@company.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="colleague@example.com"
           />
-        </div>
-
-        <div>
-          <label>Role</label>
-          <select
-            value={formData.role}
-            onChange={(e) => setFormData({ ...formData, role: e.target.value as 'admin' | 'member' })}
-          >
-            <option value="member">Member</option>
-            <option value="admin">Admin</option>
-          </select>
+          <p>
+            Note: The user must already have registered an account on this app.
+          </p>
         </div>
 
         <div>
           <button type="button" onClick={onClose}>Cancel</button>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-        >
-            {isSubmitting ? "Sending..." : "Invite Member"}
+          <button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Inviting..." : "Invite Member"}
           </button>
         </div>
       </form>
@@ -93,6 +87,6 @@ export default function InviteTeamModal({ isOpen, onClose }: { isOpen: boolean; 
   );
 }
 
-function setErrorMessage(arg0: string) {
-    throw new Error("Function not implemented." + {arg0});
-}
+// function setErrorMessage(arg0: string) {
+//     throw new Error("Function not implemented." + {arg0});
+// }
