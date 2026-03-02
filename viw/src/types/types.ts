@@ -11,6 +11,8 @@ export interface Task {
   column_id: string;
   title: string;  // Changed from 'content' to match SQL
   position_index: number;
+  description?: string;
+
 }
 
 export type Id = string;

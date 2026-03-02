@@ -115,3 +115,19 @@ export const deleteTask = async (taskId: string) => {
 
   if (error) throw error;
 };
+
+
+
+
+
+export const updateTaskDetails = async (taskId: string, title: string, description: string) => {
+  const { error } = await supabase
+    .from('tasks')
+    .update({ 
+      title: title, 
+      description: description 
+    })
+    .eq('id', taskId);
+
+  if (error) throw error;
+};

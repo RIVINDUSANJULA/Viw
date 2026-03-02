@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 
 import { useTenant } from "../../context/TenantContext";
 import { deleteTask, fetchColumns, fetchTasks, updateTaskColumn } from "../api/kanbanApi";
+import EditTaskModal from "../../components/ui/EditTaskModal";
+import Modal from "../../components/ui/Modal";
 
 
 export default function KanbanBoard() {
@@ -14,6 +16,16 @@ export default function KanbanBoard() {
   const { activeTenant } = useTenant();
   const [columns, setColumns] = useState<ColumnType[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+
+
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
+  const handleTaskClick = (task: Task) => {
+    console.log("Task Clicked:", task.title);
+    setSelectedTask(task);
+  };
 
 
   //Supabase
@@ -119,6 +131,13 @@ export default function KanbanBoard() {
   if (!columns.length) return <div>No columns found.</div>;
 
 
+
+
+  const handleTaskUpdated = (updatedTask: Task) => {
+    setTasks(prevTasks => prevTasks.map(t => t.id === updatedTask.id ? updatedTask : t));
+  };
+
+
   return (
     <div>
       {columns.map((col) => (
@@ -130,8 +149,40 @@ export default function KanbanBoard() {
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDelete={handleDelete}
+
+          onTaskClick={handleTaskClick}
         />
       ))}
+
+      <EditTaskModal 
+        isOpen={!!editingTask} 
+        onClose={() => setEditingTask(null)} 
+        task={editingTask}
+        onTaskUpdated={handleTaskUpdated}
+      />
+
+
+
+
+      
+      {selectedTask && (
+        <Modal 
+          isOpen={!!selectedTask} 
+          onClose={() => setSelectedTask(null)} 
+          title="Task Details"
+        >
+          <div>
+            <div>{selectedTask.title}</div>
+            <div>Status: {selectedTask.column_id}</div>
+            <button>
+              Delete Task
+            </button>
+          </div>
+        </Modal>
+      )}
+       
+
+      
     </div>
   )
 }
