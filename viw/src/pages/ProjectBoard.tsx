@@ -3,6 +3,7 @@ import KanbanBoard from "../features/components/KanbanBoard";
 import { useTenant } from "../context/TenantContext";
 import { createTask } from "../features/api/kanbanApi";
 import Modal from "../components/ui/Modal";
+import { supabase } from "../lib/supabase";
 
 export default function ProjectBoard() {
   const { activeTenant } = useTenant();
@@ -31,6 +32,13 @@ export default function ProjectBoard() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+
+
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
   };
   
   return (
@@ -74,6 +82,11 @@ export default function ProjectBoard() {
           </div>
         </form>
       </Modal>
+      <div>
+        <button onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
     </div>
   );
 }
