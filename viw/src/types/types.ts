@@ -24,7 +24,7 @@ export interface Column {
 }
 
 export interface ColumnType {
-  id: string | number;
+  id: string;
   title: string;
 
   
