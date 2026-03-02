@@ -1,10 +1,10 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import Projects from "./pages/Projects";
+// import Projects from "./pages/Projects";
 import './App.css'
 import ProjectBoard from './pages/ProjectBoard';
 import NotFound from "./pages/notFound";
 import { TenantProvider, useTenant } from './context/TenantContext';
-import AppLayout from './components/layout/AppLayout';
+// import AppLayout from './components/layout/AppLayout';
 import AuthProvider, { useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -35,27 +35,29 @@ export default function App() {
             <Route path="/register" element={<Register />} />
 
             {/* Protected Routes inside the Layout */}
-            <Route path="/" element={
+            {/* <Route path="/" element={
               <ProtectedRoute>
                 <AppLayout>
                   <Navigate to="/projects" replace />
                 </AppLayout>
               </ProtectedRoute>
-            } />
+            } /> */}
             
             <Route path="/projects" element={
               <ProtectedRoute>
-                <AppLayout><Projects /></AppLayout>
+                <Navigate to="/board" replace />
               </ProtectedRoute>
             } />
             
             <Route path="/board" element={
               <ProtectedRoute>
-                <AppLayout><ProjectBoard /></AppLayout>
+                <ProjectBoard />
               </ProtectedRoute>
             } />
 
             <Route path="*" element={<NotFound />} />
+
+            <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </BrowserRouter>
       </TenantProvider>
