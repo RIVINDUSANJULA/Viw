@@ -131,3 +131,38 @@ export const updateTaskDetails = async (taskId: string, title: string, descripti
 
   if (error) throw error;
 };
+
+
+
+export const inviteUserToWorkspace = async (tenantId: string, email: string) => {
+
+  
+  const { data: userId, error: lookupError } = await supabase.rpc('get_user_id_by_email', { 
+    email_to_check: email 
+  });
+
+  if (lookupError) throw new Error("Database error looking up user.");
+  if (!userId) throw new Error("No registered user found with that email.");
+
+  //Already in the workspace --> prevent duplicates
+  const { data: existingLink } = await supabase
+    .from('tenant_users')
+    .select('user_id')
+    .eq('tenant_id', tenantId)
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (existingLink) throw new Error("User is already in this workspace.");
+
+  const { error: linkError } = await supabase
+    .from('tenant_users')
+    .insert([{
+      tenant_id: tenantId,
+      user_id: userId,
+      role: 'member'
+    }]);
+
+  if (linkError) throw new Error("Failed to add user to workspace.");
+  
+  return true;
+};

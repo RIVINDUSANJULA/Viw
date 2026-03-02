@@ -30,6 +30,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
         const { data: { session } } = await supabase.auth.getSession();
         const user = session?.user;
 
+
         if (!user) {
           console.log("No user is logged in.");
           setIsLoading(false);
@@ -48,8 +49,8 @@ export function TenantProvider({ children }: { children: ReactNode }) {
 
         if (error) {
           console.error("Error fetching user workspace:", error.message);
-        } else if (data && data.tenants) {
-          // Supabase joins can sometimes return arrays depending on schema, so we handle both safely
+          } 
+        else if (data && data.tenants) {
           const tenantData = Array.isArray(data.tenants) ? data.tenants[0] : data.tenants;
           
           if (tenantData) {
