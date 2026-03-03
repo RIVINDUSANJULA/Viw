@@ -55,7 +55,7 @@ export default function App() {
               </ProtectedRoute>
             } />
 
-            <Route path="*" element={<NotFound />} />
+            {/* <Route path="*" element={<NotFound />} /> */}
 
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
