@@ -7,7 +7,7 @@ import { supabase } from "../lib/supabase";
 import InviteTeamModal from "../components/ui/InviteTeamModal";
 
 export default function ProjectBoard() {
-  const { activeTenant } = useTenant();
+  const { activeTenant, availableTenants, setActiveTenant } = useTenant();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTaskContent, setNewTaskContent] = useState("");
@@ -47,8 +47,27 @@ export default function ProjectBoard() {
   
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-        <h2>{activeTenant?.name || "Loading Workspace..."}</h2>
+      <div>
+        <div>
+          <h2>{activeTenant?.name || "Loading..."}</h2>
+          
+          {/* Only show dropdown if they belong to more than 1 workspace */}
+          {availableTenants.length > 1 && (
+            <select 
+              value={activeTenant?.id || ""}
+              onChange={(e) => {
+                const selected = availableTenants.find(t => t.id === e.target.value);
+                if (selected) setActiveTenant(selected);
+              }}
+            >
+              {availableTenants.map((tenant) => (
+                <option key={tenant.id} value={tenant.id}>
+                  Switch to: {tenant.name}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
         <button onClick={() => setIsInviteModalOpen(true)}>
             Invite Member
         </button>
@@ -63,17 +82,16 @@ export default function ProjectBoard() {
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create New Task">
         <form onSubmit={handleCreateTask}>
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px' }}>Task Description</label>
+          <div>
+            <label>Task Description</label>
             <textarea
-              style={{ width: '100%', minHeight: '80px' }}
               value={newTaskContent}
               onChange={(e) => setNewTaskContent(e.target.value)}
               placeholder="What needs to be done?"
               required
             />
           </div>
-          <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+          <div>
             <button 
               type="button" 
               onClick={() => setIsModalOpen(false)}

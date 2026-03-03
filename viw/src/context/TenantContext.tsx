@@ -11,6 +11,7 @@ interface TenantContextType {
   activeTenant: Tenant | null;
   setActiveTenant: (tenant: Tenant) => void;
   isLoading: boolean;
+  availableTenants: Tenant[];
 }
 
 //BELOW ONE EXPLAIN
@@ -23,6 +24,9 @@ export function TenantProvider({ children }: { children: ReactNode }) {
 
   const [activeTenant, setActiveTenant] = useState<Tenant | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [availableTenants, setAvailableTenants] = useState<Tenant[]>([]); // <-- NEW
+  
 
   useEffect(() => {
     async function fetchUserWorkspace() {
@@ -43,21 +47,21 @@ export function TenantProvider({ children }: { children: ReactNode }) {
             tenant_id,
             tenants ( id, name )
           `)
-          .eq('user_id', user.id)
-          .limit(1)
-          .maybeSingle();
+          .eq('user_id', user.id);
+          // .limit(1)
+          // .maybeSingle();
 
         if (error) {
-          console.error("Error fetching user workspace:", error.message);
-          } 
-        else if (data && data.tenants) {
-          const tenantData = Array.isArray(data.tenants) ? data.tenants[0] : data.tenants;
+          console.error("Error fetching user workspaces:", error.message);
+        } else if (data && data.length > 0) {
+          const tenantsList = data.map(row => {
+            return Array.isArray(row.tenants) ? row.tenants[0] : row.tenants;
+          }).filter(Boolean) as Tenant[];
           
-          if (tenantData) {
-            setActiveTenant({
-              id: tenantData.id,
-              name: tenantData.name
-            });
+          setAvailableTenants(tenantsList);
+          
+          if (!activeTenant) {
+            setActiveTenant(tenantsList[0]);
           }
         }
 
@@ -84,10 +88,10 @@ export function TenantProvider({ children }: { children: ReactNode }) {
       authListener.subscription.unsubscribe();
     };
 
-  }, []);
+  }, [activeTenant]);
 
   return (
-    <TenantContext.Provider value={{ activeTenant, setActiveTenant, isLoading }}>
+    <TenantContext.Provider value={{ activeTenant, setActiveTenant, isLoading ,availableTenants }}>
       {isLoading ? (
         <div>Loading Workspace Data...</div>
         ) : (

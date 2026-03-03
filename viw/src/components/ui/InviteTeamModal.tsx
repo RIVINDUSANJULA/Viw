@@ -87,6 +87,3 @@ export default function InviteTeamModal({ isOpen, onClose }: { isOpen: boolean; 
   );
 }
 
-// function setErrorMessage(arg0: string) {
-//     throw new Error("Function not implemented." + {arg0});
-// }
