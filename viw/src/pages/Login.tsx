@@ -10,6 +10,17 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    // useEffect(() => {
+    //     const checkUser = async () => {
+    //         const { data: { session } } = await supabase.auth.getSession();
+    //         if (session) {
+    //             navigate("/projects");
+    //         }
+    //     };
+
+    //     checkUser();
+    // }, [navigate]);
+
     const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);

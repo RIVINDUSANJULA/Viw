@@ -22,6 +22,15 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function PublicRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+
+  if (loading) return <div>Loading...</div>;
+  if (user) return <Navigate to="/projects" replace />;
+
+  return <>{children}</>;
+}
+
 export default function App() {
 
 
@@ -30,18 +39,19 @@ export default function App() {
       <TenantProvider>
         <BrowserRouter>
           <Routes>
-            {/* Public / Unprotected Routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
 
-            {/* Protected Routes inside the Layout */}
-            {/* <Route path="/" element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <Navigate to="/projects" replace />
-                </AppLayout>
-              </ProtectedRoute>
-            } /> */}
+            <Route path="/" element={<Navigate to="/projects" replace />} />
+
+            <Route path="/login" element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            } />
+            <Route path="/register" element={
+              <PublicRoute>
+                <Register />
+              </PublicRoute>
+            } />
             
             <Route path="/projects" element={
               <ProtectedRoute>
@@ -55,9 +65,8 @@ export default function App() {
               </ProtectedRoute>
             } />
 
-            {/* <Route path="*" element={<NotFound />} /> */}
-
-            <Route path="*" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<NotFound />} />
+            
           </Routes>
         </BrowserRouter>
       </TenantProvider>
