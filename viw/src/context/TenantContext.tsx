@@ -34,7 +34,6 @@ export function TenantProvider({ children }: { children: ReactNode }) {
         const { data: { session } } = await supabase.auth.getSession();
         const user = session?.user;
 
-
         if (!user) {
           console.log("No user is logged in.");
           setIsLoading(false);
@@ -81,6 +80,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
         fetchUserWorkspace();
       } else if (event === 'SIGNED_OUT') {
         setActiveTenant(null);
+        setAvailableTenants([]);
       }
     });
 
@@ -91,7 +91,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
   }, [activeTenant]);
 
   return (
-    <TenantContext.Provider value={{ activeTenant, setActiveTenant, isLoading ,availableTenants }}>
+    <TenantContext.Provider value={{ activeTenant, setActiveTenant ,availableTenants, isLoading }}>
       {isLoading ? (
         <div>Loading Workspace Data...</div>
         ) : (
@@ -105,6 +105,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
 // eslint-disable-next-line react-refresh/only-export-components
 export function useTenant() {
   const context = useContext(TenantContext);
+  // console.log(context?.activeTenant?.name)
   if (!context) {
     throw new Error("useTenant must be used within a TenantProvider");
   }

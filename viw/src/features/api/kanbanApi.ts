@@ -33,7 +33,6 @@ export const updateTaskColumn = async (taskId: string | number, newColumnId: str
 
 
 export const createTask = async (tenantId: string, columnId: string | number, content: string) => {
-  
 
   const { data: tenantCheck } = await supabase
     .from('projects')
@@ -98,8 +97,10 @@ export const createTask = async (tenantId: string, columnId: string | number, co
     .select()
     .single();
 
+
   if (taskError) throw taskError;
   return newTask as Task;
+
 };
 
 
@@ -135,7 +136,6 @@ export const updateTaskDetails = async (taskId: string, title: string, descripti
 
 
 export const inviteUserToWorkspace = async (tenantId: string, email: string) => {
-
   
   const { data: userId, error: lookupError } = await supabase.rpc('get_user_id_by_email', { 
     email_to_check: email 

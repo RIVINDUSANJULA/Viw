@@ -16,7 +16,7 @@ export default function ProjectBoard() {
   // FORCE Kanban Refresh
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false); // <-- NEW STATE
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   
 
   const handleCreateTask = async (e: React.FormEvent) => {
@@ -26,10 +26,9 @@ export default function ProjectBoard() {
     setIsSubmitting(true);
     try {
       await createTask(activeTenant.id, "todo", newTaskContent); 
-      
       setNewTaskContent("");
       setIsModalOpen(false);
-      setRefreshTrigger(prev => prev + 1); // Tell the board to refetch tasks
+      setRefreshTrigger(prev => prev + 1); 
     } catch (error) {
       console.error("Failed to create task:", error);
       alert("Error creating task. Check console.");
@@ -61,6 +60,7 @@ export default function ProjectBoard() {
               }}
             >
               {availableTenants.map((tenant) => (
+                
                 <option key={tenant.id} value={tenant.id}>
                   Switch to: {tenant.name}
                 </option>

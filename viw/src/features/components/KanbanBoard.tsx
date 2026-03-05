@@ -70,6 +70,7 @@ export default function KanbanBoard() {
     e.preventDefault();
     const taskId = e.dataTransfer.getData("taskId");
     if (!taskId) return;
+  
     
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
@@ -80,6 +81,7 @@ export default function KanbanBoard() {
 
     //Supabase
     const performUpdate = async () => {
+      console.log("AAA")
       try {
         await updateTaskColumn(taskId, columnId);
     } catch (error) {
@@ -88,12 +90,15 @@ export default function KanbanBoard() {
 
       if (activeTenant) {
         const refreshedTasks = await fetchTasks(activeTenant.id);
+
+        // console.log(activeTenant)
         setTasks(refreshedTasks);
       }
 
 
     }
 
+    
 
     performUpdate();
 
@@ -129,6 +134,9 @@ export default function KanbanBoard() {
 
 
   if (!columns.length) return <div>No columns found.</div>;
+  // if (tasks) console.log(tasks)
+
+  // if (columns.length) return console.log(columns);
 
 
 
@@ -137,14 +145,14 @@ export default function KanbanBoard() {
     setTasks(prevTasks => prevTasks.map(t => t.id === updatedTask.id ? updatedTask : t));
   };
 
-
   return (
     <div>
+      {/* {activeTenant?.id == } */}
       {columns.map((col) => (
         <Column
           key={col.id}
           column={col}
-          tasks={tasks.filter((task) => task.column_id === col.id)}
+          tasks={tasks.filter((task) => task.column_id === col.id && task.tenant_id === activeTenant?.id)}
           onDragStart={handleDragStart}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
