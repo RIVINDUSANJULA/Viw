@@ -61,10 +61,12 @@ export function TenantProvider({ children }: { children: ReactNode }) {
           }).filter(Boolean) as Tenant[];
           
           setAvailableTenants(tenantsList);
+
+          setActiveTenant(prev => prev ? prev : tenantsList[0]);
           
-          if (!activeTenant) {
-            setActiveTenant(tenantsList[0]);
-          }
+          // if (!activeTenant) {
+          //   setActiveTenant(tenantsList[0]);
+          // }
         }
 
       } catch (err) {

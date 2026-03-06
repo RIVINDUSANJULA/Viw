@@ -25,7 +25,7 @@ export default function ProjectBoard() {
 
     setIsSubmitting(true);
     try {
-      await createTask(activeTenant.id, "todo", newTaskContent); 
+      await createTask(activeTenant.id, newTaskContent); 
       setNewTaskContent("");
       setIsModalOpen(false);
       setRefreshTrigger(prev => prev + 1); 

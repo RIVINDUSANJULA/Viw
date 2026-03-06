@@ -32,7 +32,7 @@ export const updateTaskColumn = async (taskId: string | number, newColumnId: str
 };
 
 
-export const createTask = async (tenantId: string, columnId: string | number, content: string) => {
+export const createTask = async (tenantId: string, content: string) => {
 
   const { data: tenantCheck } = await supabase
     .from('projects')
@@ -66,31 +66,24 @@ export const createTask = async (tenantId: string, columnId: string | number, co
     finalProjectId = newProject.id; 
   }
 
-  const { data: columnCheck } = await supabase
+  const { data: columns , error } = await supabase
     .from('board_columns')
     .select('id')
-    .eq('id', columnId)
-    .maybeSingle();
+    .eq('id', tenantId)
+    .order('position_index', { ascending: true })
+    // .maybeSingle()
+    .limit(1);;
 
-  if (!columnCheck) {
-    console.log(`Column '${columnId}' missing. Auto-creating default board columns...`);
-    const { error: colError } = await supabase
-      .from('board_columns')
-      .insert([
-        { id: 'todo', tenant_id: tenantId, title: 'To Do', position_index: 0 },
-        { id: 'in-progress', tenant_id: tenantId, title: 'In Progress', position_index: 1 },
-        { id: 'done', tenant_id: tenantId, title: 'Done', position_index: 2 }
-      ]);
-      
-    if (colError) console.error("Failed to seed default columns:", colError);
-  }
+  if (error) throw error;
+
+  const targetColumnId = columns && columns.length > 0 ? columns[0].id : `todo-${tenantId}`;
 
   const { data: newTask, error: taskError } = await supabase
     .from('tasks')
     .insert([{
         tenant_id: tenantId,
         project_id: finalProjectId,
-        column_id: columnId,
+        column_id: targetColumnId,
         title: content,
         position_index: 0
       }])
