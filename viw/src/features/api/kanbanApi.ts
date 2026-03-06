@@ -1,6 +1,17 @@
 import { supabase } from '../../lib/supabase';
 import { type Task, type Column } from '../../types/types';
 
+// export const fetchColumns = async (tenantId: string) => {
+//   const { data, error } = await supabase
+//     .from('board_columns')
+//     .select('*')
+//     .eq('tenant_id', tenantId)
+//     .order('position_index', { ascending: true });
+
+//   if (error) throw error;
+//   return data as Column[];
+// };
+
 export const fetchColumns = async (tenantId: string) => {
   const { data, error } = await supabase
     .from('board_columns')
@@ -9,6 +20,29 @@ export const fetchColumns = async (tenantId: string) => {
     .order('position_index', { ascending: true });
 
   if (error) throw error;
+
+  if (!data || data.length === 0) {
+    console.log(`No columns found for workspace ${tenantId}. Auto-creating defaults...`);
+    
+    const defaultColumns = [
+      { id: `todo-${tenantId}`, tenant_id: tenantId, title: 'To Do', position_index: 0 },
+      { id: `in-progress-${tenantId}`, tenant_id: tenantId, title: 'In Progress', position_index: 1 },
+      { id: `done-${tenantId}`, tenant_id: tenantId, title: 'Done', position_index: 2 }
+    ];
+
+    // --- THE FIX: Use upsert to silently ignore duplicates ---
+    const { error: seedError } = await supabase
+      .from('board_columns')
+      .upsert(defaultColumns, { onConflict: 'id', ignoreDuplicates: true });
+
+    if (seedError) {
+      console.error("Failed to seed default columns:", seedError);
+      return []; 
+    }
+
+    return defaultColumns as Column[];
+  }
+
   return data as Column[];
 };
 
@@ -91,7 +125,7 @@ export const createTask = async (tenantId: string, content: string) => {
       { id: `done-${tenantId}`, tenant_id: tenantId, title: 'Done', position_index: 2 }
     ];
 
-    const { error } = await supabase.from('board_columns').insert(defaultColumns);
+    const { error } = await supabase.from('board_columns').upsert(defaultColumns, { onConflict: 'id', ignoreDuplicates: true });
     
     if (error) {
       console.log(error)
