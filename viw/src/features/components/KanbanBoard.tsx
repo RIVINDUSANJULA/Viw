@@ -155,7 +155,7 @@ export default function KanbanBoard() {
     setTasks(prevTasks => prevTasks.map(t => t.id === updatedTask.id ? updatedTask : t));
   };
 
-  console.log(tasks)
+  // console.log(tasks)
 
   return (
     <div>

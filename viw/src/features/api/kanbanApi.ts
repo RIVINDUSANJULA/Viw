@@ -76,7 +76,27 @@ export const createTask = async (tenantId: string, content: string) => {
 
   if (error) throw error;
 
-  const targetColumnId = columns && columns.length > 0 ? columns[0].id : `todo-${tenantId}`;
+  //const targetColumnId = columns && columns.length > 0 ? columns[0].id : `todo-${tenantId}`;
+
+  let targetColumnId;
+
+  if (columns && columns.length > 0) {
+    targetColumnId = columns[0].id;
+  } else {
+    console.log("No columns exist. Auto-creating before saving task...");
+    targetColumnId = `todo-${tenantId}`;
+    const defaultColumns = [
+      { id: targetColumnId, tenant_id: tenantId, title: 'To Do', position_index: 0 },
+      { id: `in-progress-${tenantId}`, tenant_id: tenantId, title: 'In Progress', position_index: 1 },
+      { id: `done-${tenantId}`, tenant_id: tenantId, title: 'Done', position_index: 2 }
+    ];
+
+    const { error } = await supabase.from('board_columns').insert(defaultColumns);
+    
+    if (error) {
+      console.log(error)
+    }
+  }
 
   const { data: newTask, error: taskError } = await supabase
     .from('tasks')
