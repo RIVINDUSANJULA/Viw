@@ -56,29 +56,7 @@ export default function KanbanBoard() {
 
       loadBoardData();
 
-        
-
-      const performUpdateOriginal = async () => {
-      try {
-        // await updateTaskColumn(taskId, columnId);
-    } catch (error) {
-        console.error("Failed to update task in database:", error);
-        alert("Failed to move task. Reverting...");}
-
-      if (activeTenant) {
-        const refreshedTasks = await fetchTasks(activeTenant.id);
-        console.log(activeTenant.name)
-
-        // console.log(activeTenant)
-        setTasks(refreshedTasks);
-      }
-
-
-    }
-
-    
-
-    performUpdateOriginal();
+      
     }, [activeTenant]);
 
 
@@ -177,6 +155,8 @@ export default function KanbanBoard() {
     setTasks(prevTasks => prevTasks.map(t => t.id === updatedTask.id ? updatedTask : t));
   };
 
+  console.log(tasks)
+
   return (
     <div>
       {/* {activeTenant?.id == } */}
@@ -191,8 +171,13 @@ export default function KanbanBoard() {
           onDelete={handleDelete}
 
           onTaskClick={handleTaskClick}
+          
         />
       ))}
+
+      {/* {columns.map((col) => (
+        <h1>${col.title}</h1>
+      ))} */}
 
       <EditTaskModal 
         isOpen={!!editingTask} 
