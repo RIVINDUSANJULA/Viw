@@ -46,10 +46,13 @@ export function TenantProvider({ children }: { children: ReactNode }) {
             tenant_id,
             tenants ( id, name )
           `)
-          .eq('user_id', user.id);
+          .eq('user_id', user.id)
+          // .eq('tenant_id', tenan)
+          ;
           // .limit(1)
           // .maybeSingle();
 
+          
         if (error) {
           console.error("Error fetching user workspaces:", error.message);
         } else if (data && data.length > 0) {
@@ -105,7 +108,6 @@ export function TenantProvider({ children }: { children: ReactNode }) {
 // eslint-disable-next-line react-refresh/only-export-components
 export function useTenant() {
   const context = useContext(TenantContext);
-  // console.log(context?.activeTenant?.name)
   if (!context) {
     throw new Error("useTenant must be used within a TenantProvider");
   }

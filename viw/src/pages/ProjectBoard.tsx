@@ -43,6 +43,8 @@ export default function ProjectBoard() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };
+
+  // console.log(refreshTrigger)
   
   return (
     <div>

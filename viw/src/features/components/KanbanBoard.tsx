@@ -32,24 +32,54 @@ export default function KanbanBoard() {
   useEffect(() => {
     if (!activeTenant) return;
 
+    // console.log(activeTenant.name)
+
     const loadBoardData = async () => {
       setLoading(true);
       try {
         const [fetchedColumns, fetchedTasks] = await Promise.all([
           fetchColumns(activeTenant.id),
           fetchTasks(activeTenant.id)
-        ]);
+        ]);        
         setColumns(fetchedColumns);
         setTasks(fetchedTasks);
-      } catch (error) {
-        console.error("Error loading board data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+        // console.log(fetchTasks.name)
 
-    loadBoardData();
-  }, [activeTenant]);
+
+          
+        } catch (error) {
+          console.error("Error loading board data:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      loadBoardData();
+
+        
+
+      const performUpdateOriginal = async () => {
+      try {
+        // await updateTaskColumn(taskId, columnId);
+    } catch (error) {
+        console.error("Failed to update task in database:", error);
+        alert("Failed to move task. Reverting...");}
+
+      if (activeTenant) {
+        const refreshedTasks = await fetchTasks(activeTenant.id);
+        console.log(activeTenant.name)
+
+        // console.log(activeTenant)
+        setTasks(refreshedTasks);
+      }
+
+
+    }
+
+    
+
+    performUpdateOriginal();
+    }, [activeTenant]);
 
 
   
@@ -81,7 +111,7 @@ export default function KanbanBoard() {
 
     //Supabase
     const performUpdate = async () => {
-      console.log("AAA")
+      console.log("aaaaaaaaa");
       try {
         await updateTaskColumn(taskId, columnId);
     } catch (error) {
@@ -90,6 +120,7 @@ export default function KanbanBoard() {
 
       if (activeTenant) {
         const refreshedTasks = await fetchTasks(activeTenant.id);
+        console.log(activeTenant.name)
 
         // console.log(activeTenant)
         setTasks(refreshedTasks);
@@ -104,6 +135,7 @@ export default function KanbanBoard() {
 
 
   };
+  
 
 
 
