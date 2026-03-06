@@ -104,9 +104,10 @@ export const createTask = async (tenantId: string, content: string) => {
     .from('board_columns')
     .select('id')
     .eq('id', tenantId)
-    .order('position_index', { ascending: true })
+    // .order('position_index', { ascending: true })
     // .maybeSingle()
-    .limit(1);;
+    // .limit(1)
+    ;
 
   if (error) throw error;
 
@@ -119,6 +120,7 @@ export const createTask = async (tenantId: string, content: string) => {
   } else {
     console.log("No columns exist. Auto-creating before saving task...");
     targetColumnId = `todo-${tenantId}`;
+    console.log(tenantId)
     const defaultColumns = [
       { id: targetColumnId, tenant_id: tenantId, title: 'To Do', position_index: 0 },
       { id: `in-progress-${tenantId}`, tenant_id: tenantId, title: 'In Progress', position_index: 1 },
