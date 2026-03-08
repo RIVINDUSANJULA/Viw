@@ -32,7 +32,6 @@ export default function KanbanBoard() {
   useEffect(() => {
     if (!activeTenant) return;
 
-    // console.log(activeTenant.name)
 
     const loadBoardData = async () => {
       setLoading(true);
@@ -43,7 +42,6 @@ export default function KanbanBoard() {
         ]);        
         setColumns(fetchedColumns);
         setTasks(fetchedTasks);
-        // console.log(fetchTasks.name)
 
 
           
@@ -89,7 +87,6 @@ export default function KanbanBoard() {
 
     //Supabase
     const performUpdate = async () => {
-      console.log("aaaaaaaaa");
       try {
         await updateTaskColumn(taskId, columnId);
     } catch (error) {
@@ -98,9 +95,7 @@ export default function KanbanBoard() {
 
       if (activeTenant) {
         const refreshedTasks = await fetchTasks(activeTenant.id);
-        console.log(activeTenant.name)
 
-        // console.log(activeTenant)
         setTasks(refreshedTasks);
       }
 
@@ -144,9 +139,6 @@ export default function KanbanBoard() {
 
 
   if (!columns.length) return <div>No columns found.</div>;
-  // if (tasks) console.log(tasks)
-
-  // if (columns.length) return console.log(columns);
 
 
 
@@ -155,7 +147,6 @@ export default function KanbanBoard() {
     setTasks(prevTasks => prevTasks.map(t => t.id === updatedTask.id ? updatedTask : t));
   };
 
-  // console.log(tasks)
 
   return (
     <div>

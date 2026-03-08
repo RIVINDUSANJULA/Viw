@@ -119,8 +119,8 @@ export const createTask = async (tenantId: string, content: string) => {
     targetColumnId = columns[0].id;
   } else {
     // console.log("No columns exist. Auto-creating before saving task...");
+    //ABOVE IS AYONNYING
     targetColumnId = `todo-${tenantId}`;
-    console.log(tenantId)
     const defaultColumns = [
       { id: targetColumnId, tenant_id: tenantId, title: 'To Do', position_index: 0 },
       { id: `in-progress-${tenantId}`, tenant_id: tenantId, title: 'In Progress', position_index: 1 },

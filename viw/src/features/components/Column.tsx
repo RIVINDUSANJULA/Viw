@@ -11,7 +11,6 @@ interface Props {
 }
 
 export default function Column({ column, tasks, onDragStart, onDrop, onDragOver, onDelete, onTaskClick }: Props) {
-  // console.log(column.tenant_id)
 
   return (
     <div onDrop={(e) => onDrop(e, column.id)} onDragOver={onDragOver}>
