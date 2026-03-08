@@ -1,11 +1,11 @@
-import type { ColumnType, Task } from "../../types/types"
+import type { ColumnType, Task, WorkspaceMember } from "../../types/types"
 import Column from "./Column";
 
 import { useEffect, useState } from "react";
 
 
 import { useTenant } from "../../context/TenantContext";
-import { deleteTask, fetchColumns, fetchTasks, updateTaskColumn } from "../api/kanbanApi";
+import { deleteTask, fetchColumns, fetchTasks, fetchWorkspaceMembers, updateTaskColumn , assignTaskToUser } from "../api/kanbanApi";
 import EditTaskModal from "../../components/ui/EditTaskModal";
 import Modal from "../../components/ui/Modal";
 
@@ -22,8 +22,10 @@ export default function KanbanBoard() {
 
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
+  const [members, setMembers] = useState<WorkspaceMember[]>([]);
+
   const handleTaskClick = (task: Task) => {
-    console.log("Task Clicked:", task.title);
+    // console.log("Task Clicked:", task.title);
     setSelectedTask(task);
   };
 
@@ -36,12 +38,14 @@ export default function KanbanBoard() {
     const loadBoardData = async () => {
       setLoading(true);
       try {
-        const [fetchedColumns, fetchedTasks] = await Promise.all([
+        const [fetchedColumns, fetchedTasks, fetchedMembers] = await Promise.all([
           fetchColumns(activeTenant.id),
-          fetchTasks(activeTenant.id)
+          fetchTasks(activeTenant.id),
+          fetchWorkspaceMembers(activeTenant.id)
         ]);        
         setColumns(fetchedColumns);
         setTasks(fetchedTasks);
+        setMembers(fetchedMembers);
 
 
           
@@ -147,6 +151,23 @@ export default function KanbanBoard() {
     setTasks(prevTasks => prevTasks.map(t => t.id === updatedTask.id ? updatedTask : t));
   };
 
+  const handleAssigneeChange = async (taskId: string, userId: string) => {
+    const newAssigneeId = userId === "unassigned" ? null : userId;
+    
+    setTasks(prev => prev.map(t => t.id === taskId ? { ...t, assignee_id: newAssigneeId } : t));
+    
+    if (selectedTask) {
+      setSelectedTask({ ...selectedTask, assignee_id: newAssigneeId });
+    }
+
+    try {
+      await assignTaskToUser(taskId, newAssigneeId);
+    } catch (err) {
+      console.error("Failed to assign user", err);
+      alert("Failed to assign user.");
+    }
+  };
+
 
   return (
     <div>
@@ -162,6 +183,7 @@ export default function KanbanBoard() {
           onDelete={handleDelete}
 
           onTaskClick={handleTaskClick}
+          members={members}
           
         />
       ))}
@@ -190,6 +212,25 @@ export default function KanbanBoard() {
           <div>
             <div>{selectedTask.title}</div>
             <div>Status: {selectedTask.column_id}</div>
+
+            <div>
+              <label>
+                Assigned To:
+              </label>
+              <select
+                value={selectedTask.assignee_id || "unassigned"}
+                onChange={(e) => handleAssigneeChange(selectedTask.id, e.target.value)}
+              >
+                <option value="unassigned">Unassigned</option>
+                {members.map(member => (
+                  <option key={member.user_id} value={member.user_id}>
+                    {member.email} ({member.role})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+
             <button>
               Delete Task
             </button>

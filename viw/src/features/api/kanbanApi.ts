@@ -49,8 +49,9 @@ export const fetchColumns = async (tenantId: string) => {
 export const fetchTasks = async (tenantId: string) => {
   const { data, error } = await supabase
     .from('tasks')
-    .select('*')
-    .eq('tenant_id', tenantId);
+    .select('* , tenants ( name )')
+    // .eq('tenant_id', tenantId)
+    ;
 
   if (error) throw error;
   return data as Task[];
@@ -214,4 +215,24 @@ export const inviteUserToWorkspace = async (tenantId: string, email: string) => 
   if (linkError) throw new Error("Failed to add user to workspace.");
   
   return true;
+};
+
+
+
+export const fetchWorkspaceMembers = async (tenantId : string) => {
+  const { data, error } = await supabase.rpc('get_workspace_members', {
+    workspace_id: tenantId
+  });
+
+  if (error) throw new Error("Failed to fetch workspace members.");
+  return data;
+};
+
+export const assignTaskToUser = async (taskId: string, userId: string | null) => {
+  const { error } = await supabase
+    .from('tasks')
+    .update({ assignee_id: userId })
+    .eq('id', taskId);
+
+  if (error) throw error;
 };

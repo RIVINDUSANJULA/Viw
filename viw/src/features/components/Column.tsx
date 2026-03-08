@@ -1,4 +1,4 @@
-import type { ColumnType, Task } from "../../types/types";
+import type { ColumnType, Task, WorkspaceMember } from "../../types/types";
 import TaskCard from "./TaskCard";
 interface Props {
   column: ColumnType;
@@ -8,9 +8,10 @@ interface Props {
   onDragOver: (e: React.DragEvent) => void;
   onDelete: (taskId: string) => void;
   onTaskClick: (task: Task) => void;
+  members: WorkspaceMember[];
 }
 
-export default function Column({ column, tasks, onDragStart, onDrop, onDragOver, onDelete, onTaskClick }: Props) {
+export default function Column({ column, tasks, onDragStart, onDrop, onDragOver, onDelete, onTaskClick, members }: Props) {
 
   return (
     <div onDrop={(e) => onDrop(e, column.id)} onDragOver={onDragOver}>
@@ -19,7 +20,7 @@ export default function Column({ column, tasks, onDragStart, onDrop, onDragOver,
         <div>
           
           {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} onDragStart={onDragStart} onDelete={onDelete} onClick={onTaskClick} />
+            <TaskCard key={task.id} task={task} onDragStart={onDragStart} onDelete={onDelete} onClick={onTaskClick} members={members} />
           ))}
 
         </div>

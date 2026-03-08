@@ -12,6 +12,10 @@ export interface Task {
   title: string;  // Changed from 'content' to match SQL
   position_index: number;
   description?: string;
+  assignee_id?: string | null;
+  tenants?: { 
+    name: string 
+  };
 
 }
 
@@ -32,4 +36,11 @@ export interface ColumnType {
   
   tenant_id: string;
   position_index: number;
+}
+
+
+export interface WorkspaceMember {
+  user_id: string;
+  role: string;
+  email?: string; 
 }
