@@ -1,17 +1,6 @@
 import { supabase } from '../../lib/supabase';
 import { type Task, type Column } from '../../types/types';
 
-// export const fetchColumns = async (tenantId: string) => {
-//   const { data, error } = await supabase
-//     .from('board_columns')
-//     .select('*')
-//     .eq('tenant_id', tenantId)
-//     .order('position_index', { ascending: true });
-
-//   if (error) throw error;
-//   return data as Column[];
-// };
-
 export const fetchColumns = async (tenantId: string) => {
   const { data, error } = await supabase
     .from('board_columns')
@@ -21,7 +10,8 @@ export const fetchColumns = async (tenantId: string) => {
 
   if (error) throw error;
 
-  if (!data || data.length === 0) {
+
+  if (!data) {
     console.log(`No columns found for workspace ${tenantId}. Auto-creating defaults...`);
     
     const defaultColumns = [
@@ -30,7 +20,6 @@ export const fetchColumns = async (tenantId: string) => {
       { id: `done-${tenantId}`, tenant_id: tenantId, title: 'Done', position_index: 2 }
     ];
 
-    // --- THE FIX: Use upsert to silently ignore duplicates ---
     const { error: seedError } = await supabase
       .from('board_columns')
       .upsert(defaultColumns, { onConflict: 'id', ignoreDuplicates: true });
@@ -40,6 +29,9 @@ export const fetchColumns = async (tenantId: string) => {
       return []; 
     }
 
+    console.log(data)
+
+    
     return defaultColumns as Column[];
   }
 
@@ -194,7 +186,6 @@ export const inviteUserToWorkspace = async (tenantId: string, email: string) => 
   if (lookupError) throw new Error("Database error looking up user.");
   if (!userId) throw new Error("No registered user found with that email.");
 
-  //Already in the workspace --> prevent duplicates
   const { data: existingLink } = await supabase
     .from('tenant_users')
     .select('user_id')

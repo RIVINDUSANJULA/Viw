@@ -8,6 +8,7 @@ import { useTenant } from "../../context/TenantContext";
 import { deleteTask, fetchColumns, fetchTasks, fetchWorkspaceMembers, updateTaskColumn , assignTaskToUser } from "../api/kanbanApi";
 import EditTaskModal from "../../components/ui/EditTaskModal";
 import Modal from "../../components/ui/Modal";
+import { supabase } from "../../lib/supabase";
 
 
 export default function KanbanBoard() {
@@ -34,6 +35,8 @@ export default function KanbanBoard() {
   useEffect(() => {
     if (!activeTenant) return;
 
+    // Data Loading Code Below
+
 
     const loadBoardData = async () => {
       setLoading(true);
@@ -57,6 +60,53 @@ export default function KanbanBoard() {
       };
 
       loadBoardData();
+
+
+
+
+
+    //Real Time Code Below
+
+      const channel = supabase
+      .channel(`tasks-sync-${activeTenant.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'tasks',
+          filter: `tenant_id=eq.${activeTenant.id}`,
+        },
+        (payload) => {
+          console.log(payload);
+
+          if (payload.eventType === 'INSERT') {
+            setTasks((prevTasks) => {
+              if (prevTasks.some(t => t.id === payload.new.id)) return prevTasks;
+              return [...prevTasks, payload.new as Task];
+            });
+          } 
+          
+          else if (payload.eventType === 'UPDATE') {
+            setTasks((prevTasks) => 
+              prevTasks.map((task) => 
+                task.id === payload.new.id ? (payload.new as Task) : task
+              )
+            );
+          } 
+          
+          else if (payload.eventType === 'DELETE') {
+            setTasks((prevTasks) => prevTasks.filter((task) => task.id !== payload.old.id));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+
+
 
       
     }, [activeTenant]);
