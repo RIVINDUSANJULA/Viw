@@ -82,6 +82,11 @@ export default function ProjectBoard() {
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create New Task">
         <form onSubmit={handleCreateTask}>
+          <button
+            onClick={() => setIsModalOpen(false)}
+          >
+            x
+          </button>
           <div>
             <label>Task Description</label>
             <textarea

@@ -209,6 +209,11 @@ export default function KanbanBoard() {
           onClose={() => setSelectedTask(null)} 
           title="Task Details"
         >
+          <button
+            onClick={() => setSelectedTask(null)}
+          >
+            X
+          </button>
           <div>
             <div>{selectedTask.title}</div>
             <div>Status: {selectedTask.column_id}</div>
