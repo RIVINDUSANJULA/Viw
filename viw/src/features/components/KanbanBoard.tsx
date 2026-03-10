@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 
 import { useTenant } from "../../context/TenantContext";
-import { deleteTask, fetchColumns, fetchTasks, fetchWorkspaceMembers, updateTaskColumn , assignTaskToUser } from "../api/kanbanApi";
+import { deleteTask, fetchColumns, fetchTasks, fetchWorkspaceMembers, updateTaskColumn , assignTaskToUser, uploadTaskAttachment } from "../api/kanbanApi";
 import EditTaskModal from "../../components/ui/EditTaskModal";
 import Modal from "../../components/ui/Modal";
 import { supabase } from "../../lib/supabase";
@@ -24,6 +24,13 @@ export default function KanbanBoard() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
+
+
+
+  const [isUploading, setIsUploading] = useState(false);
+
+
+
 
   const handleTaskClick = (task: Task) => {
     // console.log("Task Clicked:", task.title);
@@ -219,6 +226,29 @@ export default function KanbanBoard() {
   };
 
 
+
+  const handleFileUpload = async (taskId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  setIsUploading(true);
+  try {
+    const newUrl = await uploadTaskAttachment(taskId, file);
+    
+    setTasks(prev => prev.map(t => t.id === taskId ? { ...t, attachment_url: newUrl } : t));
+    
+    if (selectedTask) {
+      setSelectedTask({ ...selectedTask, attachment_url: newUrl });
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Failed to upload file.");
+  } finally {
+    setIsUploading(false);
+  }
+};
+
+
   return (
     <div>
       {/* {activeTenant?.id == } */}
@@ -283,6 +313,35 @@ export default function KanbanBoard() {
                 ))}
               </select>
             </div>
+
+
+
+
+
+            {selectedTask.attachment_url ? (
+                <div>
+                  <img 
+                    src={selectedTask.attachment_url} 
+                    alt="Task attachment" 
+                  />
+                  <a 
+                    href={selectedTask.attachment_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    Open Original Image
+                  </a>
+                </div>
+              ) : (
+                <div>No attachment yet.</div>
+              )}
+
+              <input 
+                type="file" 
+                accept="image/*,application/pdf"
+                onChange={(e) => handleFileUpload(selectedTask.id, e)}
+                disabled={isUploading}
+              />
 
 
             <button>
