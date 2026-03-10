@@ -266,7 +266,6 @@ export default function KanbanBoard() {
           </button>
           <div>
             <div>{selectedTask.title}</div>
-            <div>Status: {selectedTask.column_id}</div>
 
             <div>
               <label>

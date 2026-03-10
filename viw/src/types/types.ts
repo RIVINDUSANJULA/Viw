@@ -16,6 +16,7 @@ export interface Task {
   tenants?: { 
     name: string 
   };
+  attachment_url?: string | null;
 
 }
 

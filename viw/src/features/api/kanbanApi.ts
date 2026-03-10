@@ -15,9 +15,9 @@ export const fetchColumns = async (tenantId: string) => {
     console.log(`No columns found for workspace ${tenantId}. Auto-creating defaults...`);
     
     const defaultColumns = [
-      { id: `todo-${tenantId}`, tenant_id: tenantId, title: 'To Do', position_index: 0 },
-      { id: `in-progress-${tenantId}`, tenant_id: tenantId, title: 'In Progress', position_index: 1 },
-      { id: `done-${tenantId}`, tenant_id: tenantId, title: 'Done', position_index: 2 }
+      { id: `todo-${tenantId}`, tenant_id: tenantId, title: 'To Do', position_index: 0, position_name:"To Do" },
+      { id: `in-progress-${tenantId}`, tenant_id: tenantId, title: 'In Progress', position_index: 1, position_name:"To Do" },
+      { id: `done-${tenantId}`, tenant_id: tenantId, title: 'Done', position_index: 2, position_name:"To Do" }
     ];
 
     const { error: seedError } = await supabase
@@ -226,4 +226,34 @@ export const assignTaskToUser = async (taskId: string, userId: string | null) =>
     .eq('id', taskId);
 
   if (error) throw error;
+};
+
+
+
+export const uploadTaskAttachment = async (taskId: string, file: File) => {
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${taskId}-${Math.random()}.${fileExt}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('attachments')
+    .upload(fileName, file);
+
+  if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
+
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('attachments')
+    .getPublicUrl(fileName);
+
+
+
+    
+  const { error: updateError } = await supabase
+    .from('tasks')
+    .update({ attachment_url: publicUrl })
+    .eq('id', taskId);
+
+  if (updateError) throw new Error(`Failed to save URL to task: ${updateError.message}`);
+
+  return publicUrl;
 };
