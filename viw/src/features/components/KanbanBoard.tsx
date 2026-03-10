@@ -89,7 +89,7 @@ export default function KanbanBoard() {
           filter: `tenant_id=eq.${activeTenant.id}`,
         },
         (payload) => {
-          console.log(payload);
+          // console.log(payload);
 
           if (payload.eventType === 'INSERT') {
             setTasks((prevTasks) => {
@@ -374,7 +374,7 @@ const handleSelectExistingFile = async (taskId: string, fileName: string) => {
                     target="_blank" 
                     rel="noopener noreferrer"
                   >
-                    Open Original Image
+                    Open File
                   </a>
                 </div>
               ) : (

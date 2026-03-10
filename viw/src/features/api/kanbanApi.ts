@@ -15,9 +15,9 @@ export const fetchColumns = async (tenantId: string) => {
     console.log(`No columns found for workspace ${tenantId}. Auto-creating defaults...`);
     
     const defaultColumns = [
-      { id: `todo-${tenantId}`, tenant_id: tenantId, title: 'To Do', position_index: 0, position_name:"To Do" },
-      { id: `in-progress-${tenantId}`, tenant_id: tenantId, title: 'In Progress', position_index: 1, position_name:"To Do" },
-      { id: `done-${tenantId}`, tenant_id: tenantId, title: 'Done', position_index: 2, position_name:"To Do" }
+      { id: `todo-${tenantId}`, tenant_id: tenantId, title: 'To Do', position_index: 0},
+      { id: `in-progress-${tenantId}`, tenant_id: tenantId, title: 'In Progress', position_index: 1},
+      { id: `done-${tenantId}`, tenant_id: tenantId, title: 'Done', position_index: 2}
     ];
 
     const { error: seedError } = await supabase
