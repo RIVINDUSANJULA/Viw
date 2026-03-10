@@ -247,7 +247,7 @@ export const uploadTaskAttachment = async (taskId: string, file: File) => {
 
 
 
-    
+
   const { error: updateError } = await supabase
     .from('tasks')
     .update({ attachment_url: publicUrl })
@@ -256,4 +256,25 @@ export const uploadTaskAttachment = async (taskId: string, file: File) => {
   if (updateError) throw new Error(`Failed to save URL to task: ${updateError.message}`);
 
   return publicUrl;
+};
+
+
+export const fetchStorageFiles = async () => {
+  const { data, error } = await supabase.storage
+    .from('attachments')
+    .list();
+
+  if (error) throw new Error(`Failed to fetch files: ${error.message}`);
+  
+
+  
+  return data.filter(file => file.name !== '.emptyFolderPlaceholder');
+};
+
+export const getFilePublicUrl = (fileName: string) => {
+  const { data } = supabase.storage
+    .from('attachments')
+    .getPublicUrl(fileName);
+    
+  return data.publicUrl;
 };

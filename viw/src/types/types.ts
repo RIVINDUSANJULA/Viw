@@ -45,3 +45,9 @@ export interface WorkspaceMember {
   role: string;
   email?: string; 
 }
+
+
+export interface StorageFile {
+  id: string;
+  name: string;
+}

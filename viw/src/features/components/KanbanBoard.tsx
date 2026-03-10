@@ -1,11 +1,11 @@
-import type { ColumnType, Task, WorkspaceMember } from "../../types/types"
+import type { ColumnType, Task, WorkspaceMember, StorageFile } from "../../types/types"
 import Column from "./Column";
 
 import { useEffect, useState } from "react";
 
 
 import { useTenant } from "../../context/TenantContext";
-import { deleteTask, fetchColumns, fetchTasks, fetchWorkspaceMembers, updateTaskColumn , assignTaskToUser, uploadTaskAttachment } from "../api/kanbanApi";
+import { deleteTask, fetchColumns, fetchTasks, fetchWorkspaceMembers, updateTaskColumn , assignTaskToUser, uploadTaskAttachment, getFilePublicUrl, fetchStorageFiles } from "../api/kanbanApi";
 import EditTaskModal from "../../components/ui/EditTaskModal";
 import Modal from "../../components/ui/Modal";
 import { supabase } from "../../lib/supabase";
@@ -28,6 +28,10 @@ export default function KanbanBoard() {
 
 
   const [isUploading, setIsUploading] = useState(false);
+
+  const [availableFiles, setAvailableFiles] = useState<StorageFile[]>([]);
+  const [isFetchingFiles, setIsFetchingFiles] = useState(false);
+  const [showFileLibrary, setShowFileLibrary] = useState(false);
 
 
 
@@ -249,6 +253,43 @@ export default function KanbanBoard() {
 };
 
 
+const loadFileLibrary = async () => {
+  setIsFetchingFiles(true);
+  setShowFileLibrary(true);
+  try {
+    const files = await fetchStorageFiles();
+    setAvailableFiles(files);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setIsFetchingFiles(false);
+  }
+};
+
+const handleSelectExistingFile = async (taskId: string, fileName: string) => {
+  const publicUrl = getFilePublicUrl(fileName);
+  
+
+  setTasks(prev => prev.map(t => t.id === taskId ? { ...t, attachment_url: publicUrl } : t));
+  if (selectedTask) {
+    setSelectedTask({ ...selectedTask, attachment_url: publicUrl });
+  }
+
+
+  try {
+    const { error } = await supabase
+      .from('tasks')
+      .update({ attachment_url: publicUrl })
+      .eq('id', taskId);
+      
+    if (error) throw error;
+    setShowFileLibrary(false);
+  } catch (err) {
+    console.error("Failed to link file", err);
+  }
+};
+
+
   return (
     <div>
       {/* {activeTenant?.id == } */}
@@ -317,8 +358,12 @@ export default function KanbanBoard() {
 
 
 
-
-            {selectedTask.attachment_url ? (
+              <div>
+              <label>
+                Task Attachment
+              </label>
+              
+              {selectedTask.attachment_url ? (
                 <div>
                   <img 
                     src={selectedTask.attachment_url} 
@@ -333,15 +378,53 @@ export default function KanbanBoard() {
                   </a>
                 </div>
               ) : (
-                <div>No attachment yet.</div>
+                <div>No attachment linked.</div>
               )}
 
-              <input 
-                type="file" 
-                accept="image/*,application/pdf"
-                onChange={(e) => handleFileUpload(selectedTask.id, e)}
-                disabled={isUploading}
-              />
+              {/* The File Controls */}
+              <div>
+                <input 
+                  type="file" 
+                  accept="image/*,application/pdf"
+                  onChange={(e) => handleFileUpload(selectedTask.id, e)}
+                  disabled={isUploading}
+                />
+                <span>OR</span>
+                <button 
+                  onClick={loadFileLibrary}
+                >
+                  Choose from Storage
+                </button>
+              </div>
+              {isUploading && <span>Uploading to Cloud...</span>}
+
+              {/* The File Library Drawer */}
+              {showFileLibrary && (
+                <div>
+                  <div>
+                    <span>Your Cloud Storage</span>
+                    <button onClick={() => setShowFileLibrary(false)}>Close</button>
+                  </div>
+                  
+                  {isFetchingFiles ? (
+                    <div>Loading files...</div>
+                  ) : (
+                    <div>
+                      {availableFiles.map((file) => (
+                        <div 
+                          key={file.id} 
+                          onClick={() => handleSelectExistingFile(selectedTask.id, file.name)}
+                          title={file.name}
+                        >
+                          📄 {file.name}
+                        </div>
+                      ))}
+                      {availableFiles.length === 0 && <div>No files found.</div>}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
 
             <button>
