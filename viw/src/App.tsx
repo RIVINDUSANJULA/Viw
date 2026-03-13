@@ -8,6 +8,7 @@ import { TenantProvider, useTenant } from './context/TenantContext';
 import AuthProvider, { useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import { ThemeProvider } from './context/ThemeContext';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -35,42 +36,44 @@ export default function App() {
 
 
   return (
-    <AuthProvider>
-      <TenantProvider>
-        <BrowserRouter>
-          <Routes>
+    <ThemeProvider>
+      <AuthProvider>
+        <TenantProvider>
+          <BrowserRouter>
+            <Routes>
 
-            <Route path="/" element={<Navigate to="/projects" replace />} />
+              <Route path="/" element={<Navigate to="/projects" replace />} />
 
-            <Route path="/login" element={
-              <PublicRoute>
-                <Login />
-              </PublicRoute>
-            } />
-            <Route path="/register" element={
-              <PublicRoute>
-                <Register />
-              </PublicRoute>
-            } />
-            
-            <Route path="/projects" element={
-              <ProtectedRoute>
-                <Navigate to="/board" replace />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/board" element={
-              <ProtectedRoute>
-                <ProjectBoard />
-              </ProtectedRoute>
-            } />
+              <Route path="/login" element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              } />
+              <Route path="/register" element={
+                <PublicRoute>
+                  <Register />
+                </PublicRoute>
+              } />
+              
+              <Route path="/projects" element={
+                <ProtectedRoute>
+                  <Navigate to="/board" replace />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/board" element={
+                <ProtectedRoute>
+                  <ProjectBoard />
+                </ProtectedRoute>
+              } />
 
-            <Route path="*" element={<NotFound />} />
-            
-          </Routes>
-        </BrowserRouter>
-      </TenantProvider>
-    </AuthProvider>
+              <Route path="*" element={<NotFound />} />
+              
+            </Routes>
+          </BrowserRouter>
+        </TenantProvider>
+      </AuthProvider>
+    </ThemeProvider>
   )
 }
 

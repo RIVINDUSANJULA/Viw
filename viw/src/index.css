@@ -5,12 +5,39 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87); */
+  /* background-color: #242424; */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+
+:root {
+  --bg-main: #f3f4f6;
+  --bg-card: #ffffff;
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  --border-color: #e5e7eb;
+  --btn-bg: #e5e7eb;
+  --btn-text: #111827;
+}
+
+[data-theme='dark'] {
+  --bg-main: #111827;
+  --bg-card: #1f2937;
+  --text-main: #ffffff;
+  --text-muted: #9ca3af;
+  --border-color: #374151;
+  --btn-bg: #374151;
+  --btn-text: #ffffff;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth fade effect */
 }

@@ -5,6 +5,7 @@ import { createTask } from "../features/api/kanbanApi";
 import Modal from "../components/ui/Modal";
 import { supabase } from "../lib/supabase";
 import InviteTeamModal from "../components/ui/InviteTeamModal";
+import { useTheme } from "../context/ThemeContext";
 
 export default function ProjectBoard() {
   const { activeTenant, availableTenants, setActiveTenant } = useTenant();
@@ -43,12 +44,30 @@ export default function ProjectBoard() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };
+
+
+
+  const { theme, toggleTheme } = useTheme();
   
   return (
     <div>
       <div>
         <div>
           <h2>{activeTenant?.name || "Loading..."}</h2>
+
+          <button 
+            onClick={toggleTheme}
+            style={{ 
+              padding: '8px 12px', 
+              borderRadius: '4px', 
+              cursor: 'pointer',
+              backgroundColor: 'var(--btn-bg)', 
+              color: 'var(--btn-text)',
+              border: '1px solid var(--border-color)'
+            }}
+          >
+            {theme === 'light' ? 'Dark' : 'Light'}
+          </button>
           
           {/* Only show dropdown if they belong to more than 1 workspace */}
           {availableTenants.length > 1 && (
