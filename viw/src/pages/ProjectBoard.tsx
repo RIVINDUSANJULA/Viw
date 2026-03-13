@@ -119,9 +119,13 @@ export default function ProjectBoard() {
 
 
             <button
-              onClick={() => setIsModalOpen(true)}
+              // onClick={() => setIsModalOpen(true)}
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
             >
+              <InviteTeamModal 
+                isOpen={isInviteModalOpen} 
+                onClose={() => setIsInviteModalOpen(false)} 
+              />
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Create Task</span>
             </button>
@@ -132,11 +136,9 @@ export default function ProjectBoard() {
 
 
 
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
-          <div className="flex h-96 items-center justify-center text-muted-foreground">
-            <KanbanBoard key={refreshTrigger} />
-          </div>
+      <main className="mx-auto w-full max-w-[100vw] flex-1 px-4 py-6 sm:px-6 lg:px-8 h-[calc(100vh-80px)]">
+        <div className="flex h-full flex-col rounded-xl border border-border bg-card p-4 shadow-sm overflow-hidden">
+          <KanbanBoard key={refreshTrigger} />
         </div>
       </main>
 
