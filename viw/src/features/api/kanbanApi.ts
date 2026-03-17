@@ -259,10 +259,12 @@ export const uploadTaskAttachment = async (taskId: string, file: File) => {
 };
 
 
-export const fetchStorageFiles = async () => {
+export const fetchStorageFiles = async (taskId: string) => {
   const { data, error } = await supabase.storage
     .from('attachments')
-    .list();
+    .list('', {
+      search: taskId // <-- This tells Supabase to only return files starting with this ID
+    });
 
   if (error) throw new Error(`Failed to fetch files: ${error.message}`);
   

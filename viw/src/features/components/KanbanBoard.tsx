@@ -256,11 +256,11 @@ export default function KanbanBoard() {
 };
 
 
-const loadFileLibrary = async () => {
+const loadFileLibrary = async (taskId: string) => {
   setIsFetchingFiles(true);
   setShowFileLibrary(true);
   try {
-    const files = await fetchStorageFiles();
+    const files = await fetchStorageFiles(taskId);
     setAvailableFiles(files);
   } catch (error) {
     console.error(error);
@@ -402,7 +402,7 @@ const handleSelectExistingFile = async (taskId: string, fileName: string) => {
                     className="sr-only"
                   />
                   <button 
-                    onClick={loadFileLibrary}
+                    onClick={() => loadFileLibrary(selectedTask.id)}
                     className="flex w-full justify-center items-center gap-2 px-4 py-2 rounded-lg border border-border bg-background text-sm font-medium text-foreground hover:bg-muted transition-colors"
                   >
                     <FolderOpen className="h-4 w-4" />
