@@ -450,7 +450,7 @@ const handleSelectExistingFile = async (taskId: string, fileName: string) => {
                 )}
               </div>
 
-              <button onClick={() => handleDelete(selectedTask.id)}>
+              <button onClick={() => {handleDelete(selectedTask.id);setSelectedTask(null);}}>
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>

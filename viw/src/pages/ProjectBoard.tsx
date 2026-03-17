@@ -109,7 +109,7 @@ export default function ProjectBoard() {
 
             <button
               onClick={() => setIsInviteModalOpen(true)}
-              className="inline-flex items-center gap-2 rounded-lg border border-border bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-secondary px-4 py-2 text-sm font-medium"
             >
               <UserPlus className="h-4 w-4" />
               <span className="hidden sm:inline">Invite Member</span>
@@ -119,18 +119,13 @@ export default function ProjectBoard() {
 
 
             <button
-              // onClick={() => setIsModalOpen(true)}
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              onClick={() => setIsModalOpen(true)}
             >
-              <InviteTeamModal 
-                isOpen={isInviteModalOpen} 
-                onClose={() => setIsInviteModalOpen(false)} 
-              />
-              <button onClick={() => setIsModalOpen(true)}>
-                <span className="hidden sm:inline">Create Task</span>
-              </button>
+              <span className="hidden sm:inline">Create Task</span>
             </button>
           </div>
+          
         </div>
       </header>
 
@@ -142,6 +137,11 @@ export default function ProjectBoard() {
           <KanbanBoard key={refreshTrigger} />
         </div>
       </main>
+
+      <InviteTeamModal 
+        isOpen={isInviteModalOpen} 
+        onClose={() => setIsInviteModalOpen(false)} 
+      />
 
 
 
@@ -233,10 +233,6 @@ export default function ProjectBoard() {
         </div>
       )}
 
-      <InviteTeamModal 
-        isOpen={isInviteModalOpen} 
-        onClose={() => setIsInviteModalOpen(false)} 
-      />
 
 
 
