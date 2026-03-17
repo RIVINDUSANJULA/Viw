@@ -231,12 +231,17 @@ export const assignTaskToUser = async (taskId: string, userId: string | null) =>
 
 
 export const uploadTaskAttachment = async (taskId: string, file: File) => {
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${taskId}-${Math.random()}.${fileExt}`;
+  // const fileExt = file.name.split('.').pop();
+  // const fileName = `${taskId}-${Math.random()}.${fileExt}`;
+
+  const cleanOriginalName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+  const fileName = `${taskId}___${cleanOriginalName}`;
 
   const { error: uploadError } = await supabase.storage
     .from('attachments')
-    .upload(fileName, file);
+    .upload(fileName, file, {
+      upsert: true
+    });
 
   if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
 

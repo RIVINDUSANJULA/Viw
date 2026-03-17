@@ -399,7 +399,7 @@ const handleSelectExistingFile = async (taskId: string, fileName: string) => {
                     accept="image/*,application/pdf"
                     onChange={(e) => handleFileUpload(selectedTask.id, e)}
                     disabled={isUploading}
-                    className="sr-only"
+                    className="text-xs max-w-50"
                   />
                   <button 
                     onClick={() => loadFileLibrary(selectedTask.id)}
