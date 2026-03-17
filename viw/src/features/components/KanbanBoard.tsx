@@ -328,132 +328,134 @@ const handleSelectExistingFile = async (taskId: string, fileName: string) => {
 
       
       {selectedTask && (
-        <Modal 
-          isOpen={!!selectedTask} 
-          onClose={() => setSelectedTask(null)} 
-          title="Task Details"
-        >
-          <button
-            onClick={() => setSelectedTask(null)}
-            className="absolute top-4 right-4 p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <Modal 
+            isOpen={!!selectedTask} 
+            onClose={() => setSelectedTask(null)} 
+            title="Task Details"
           >
-            <X className="h-5 w-5" />
-          </button>
-          <div className="space-y-6">
-            <div className="text-xl font-semibold text-foreground">{selectedTask.title}</div>
+            <button
+              onClick={() => setSelectedTask(null)}
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-5 w-5" />
+            </button>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">
-                Assigned To:
-              </label>
-              <select
-                value={selectedTask.assignee_id || "unassigned"}
-                onChange={(e) => handleAssigneeChange(selectedTask.id, e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
-              >
-                <option value="unassigned">Unassigned</option>
-                {members.map(member => (
-                  <option key={member.user_id} value={member.user_id}>
-                    {member.email} ({member.role})
-                  </option>
-                ))}
-              </select>
-            </div>
+            
+            <div className="space-y-6">
+              <div className="text-xl font-semibold text-foreground">{selectedTask.title}</div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-muted-foreground">
+                  Assigned To:
+                </label>
+                <select
+                  value={selectedTask.assignee_id || "unassigned"}
+                  onChange={(e) => handleAssigneeChange(selectedTask.id, e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
+                >
+                  <option value="unassigned">Unassigned</option>
+                  {members.map(member => (
+                    <option key={member.user_id} value={member.user_id}>
+                      {member.email} ({member.role})
+                    </option>
+                  ))}
+                </select>
+              </div>
 
 
 
 
-              <div className="space-y-3">
-              <label className="text-sm font-medium text-muted-foreground">
-                Task Attachment
-              </label>
-              
-              {selectedTask.attachment_url ? (
                 <div className="space-y-3">
-                  <img 
-                    src={selectedTask.attachment_url} 
-                    alt="Task attachment" 
-                    className="w-full max-h-48 object-cover rounded-lg border border-border"
+                <label className="text-sm font-medium text-muted-foreground">
+                  Task Attachment
+                </label>
+                
+                {selectedTask.attachment_url ? (
+                  <div className="space-y-3">
+                    <img 
+                      src={selectedTask.attachment_url} 
+                      alt="Task attachment" 
+                      className="w-full max-h-48 object-cover rounded-lg border border-border"
+                    />
+                    <a 
+                      href={selectedTask.attachment_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                    >
+                      <FolderOpen className="h-4 w-4" />
+                      Open File
+                    </a>
+                  </div>
+                ) : (
+                  <div className="text-sm text-muted-foreground italic">No attachment linked.</div>
+                )}
+
+                {/* The File Controls */}
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <input 
+                    type="file" 
+                    accept="image/*,application/pdf"
+                    onChange={(e) => handleFileUpload(selectedTask.id, e)}
+                    disabled={isUploading}
+                    className="sr-only"
                   />
-                  <a 
-                    href={selectedTask.attachment_url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                  <button 
+                    onClick={loadFileLibrary}
+                    className="flex w-full justify-center items-center gap-2 px-4 py-2 rounded-lg border border-border bg-background text-sm font-medium text-foreground hover:bg-muted transition-colors"
                   >
                     <FolderOpen className="h-4 w-4" />
-                    Open File
-                  </a>
+                    Choose from Storage
+                  </button>
                 </div>
-              ) : (
-                <div className="text-sm text-muted-foreground italic">No attachment linked.</div>
-              )}
+                {isUploading && <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Uploading to Cloud...
+                </span>}
 
-              {/* The File Controls */}
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                <input 
-                  type="file" 
-                  accept="image/*,application/pdf"
-                  onChange={(e) => handleFileUpload(selectedTask.id, e)}
-                  disabled={isUploading}
-                  className="sr-only"
-                />
-                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-background text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-50">OR</span>
-                <button 
-                  onClick={loadFileLibrary}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-background text-sm font-medium text-foreground hover:bg-muted transition-colors"
-                >
-                  <FolderOpen className="h-4 w-4" />
-                  Choose from Storage
-                </button>
-              </div>
-              {isUploading && <span className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Uploading to Cloud...
-              </span>}
-
-              {/* The File Library Drawer */}
-              {showFileLibrary && (
-                <div className="mt-4 rounded-lg border border-border bg-card overflow-hidden">
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/50">
-                    <span className="text-sm font-medium text-foreground">Your Cloud Storage</span>
-                    
-                    
-                    <button 
-                      onClick={() => setShowFileLibrary(false)}
-                      className="p-1 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                  
-                  {isFetchingFiles ? (
-                    <div className="flex items-center justify-center gap-2 p-6 text-sm text-muted-foreground">Loading files...</div>
-                  ) : (
-                    <div >
-                      {availableFiles.map((file) => (
-                        <div className="flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer text-sm text-foreground hover:bg-muted transition-colors"
-                          key={file.id} 
-                          onClick={() => handleSelectExistingFile(selectedTask.id, file.name)}
-                          title={file.name}
-                        >
-                          <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                          <span className="truncate">{file.name}</span>
-                        </div>
-                      ))}
-                      {availableFiles.length === 0 && <div className="p-4 text-center text-sm text-muted-foreground italic">No files found.</div>}
+                {/* The File Library Drawer */}
+                {showFileLibrary && (
+                  <div className="mt-4 rounded-lg border border-border bg-card overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/50">
+                      <span className="text-sm font-medium text-foreground">Your Cloud Storage</span>
+                      
+                      
+                      <button 
+                        onClick={() => setShowFileLibrary(false)}
+                        className="p-1 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
                     </div>
-                  )}
-                </div>
-              )}
-            </div>
+                    
+                    {isFetchingFiles ? (
+                      <div className="flex items-center justify-center gap-2 p-6 text-sm text-muted-foreground">Loading files...</div>
+                    ) : (
+                      <div >
+                        {availableFiles.map((file) => (
+                          <div className="flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer text-sm text-foreground hover:bg-muted transition-colors"
+                            key={file.id} 
+                            onClick={() => handleSelectExistingFile(selectedTask.id, file.name)}
+                            title={file.name}
+                          >
+                            <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                            <span className="truncate">{file.name}</span>
+                          </div>
+                        ))}
+                        {availableFiles.length === 0 && <div className="p-4 text-center text-sm text-muted-foreground italic">No files found.</div>}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
-            <button onClick={() => handleDelete(selectedTask.id)}>
-              <Trash2 className="h-4 w-4" />
-              Delete Task
-            </button>
-          </div>
-        </Modal>
+              <button onClick={() => handleDelete(selectedTask.id)}>
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+          </Modal>
+        </div>
       )}
        
 
