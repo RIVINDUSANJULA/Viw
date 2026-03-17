@@ -151,6 +151,34 @@ export const createTask = async (tenantId: string, content: string) => {
 
 
 export const deleteTask = async (taskId: string) => {
+
+  const { data: filesToCleanup, error: searchError } = await supabase.storage
+    .from('attachments')
+    .list('', {
+      search: taskId
+    });
+
+  if (searchError) {
+    console.error("Failed to search for orphaned files:", searchError);
+  }
+
+  if (filesToCleanup && filesToCleanup.length > 0) {
+    const fileNames = filesToCleanup
+      .filter(f => f.name !== '.emptyFolderPlaceholder')
+      .map(f => f.name);
+
+    if (fileNames.length > 0) {
+      const { error: storageDeleteError } = await supabase.storage
+        .from('attachments')
+        .remove(fileNames);
+
+      if (storageDeleteError) {
+        console.error("Failed to delete files from storage:", storageDeleteError);
+      }
+    }
+  }
+
+
   const { error } = await supabase
     .from('tasks')
     .delete()
