@@ -6,12 +6,12 @@ interface Props {
   onDragStart: (e: React.DragEvent, task: Task) => void;
   onDrop: (e: React.DragEvent, columnId: string) => void;
   onDragOver: (e: React.DragEvent) => void;
-  onDelete: (taskId: string) => void;
+  // onDelete: (taskId: string) => void;
   onTaskClick: (task: Task) => void;
   members: WorkspaceMember[];
 }
 
-export default function Column({ column, tasks, onDragStart, onDrop, onDragOver, onDelete, onTaskClick, members }: Props) {
+export default function Column({ column, tasks, onDragStart, onDrop, onDragOver, /*onDelete , */ onTaskClick, members }: Props) {
 
   return (
     <div onDrop={(e) => onDrop(e, column.id)} onDragOver={onDragOver}>
@@ -20,7 +20,7 @@ export default function Column({ column, tasks, onDragStart, onDrop, onDragOver,
         <div>
           
           {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} onDragStart={onDragStart} onDelete={onDelete} onClick={onTaskClick} members={members} />
+            <TaskCard key={task.id} task={task} onDragStart={onDragStart} /*{onDelete={onDelete}}*/ onClick={onTaskClick} members={members} />
           ))}
 
         </div>

@@ -6,7 +6,7 @@ import { createTask } from "../features/api/kanbanApi";
 import { supabase } from "../lib/supabase";
 import InviteTeamModal from "../components/ui/InviteTeamModal";
 import { useTheme } from "../context/ThemeContext";
-import { ChevronDown, LogOut, Moon, Plus, Sun, UserPlus, X } from "lucide-react";
+import { ChevronDown, LogOut, Moon, Sun, UserPlus, X } from "lucide-react";
 
 export default function ProjectBoard() {
   const { activeTenant, availableTenants, setActiveTenant } = useTenant();
@@ -126,8 +126,9 @@ export default function ProjectBoard() {
                 isOpen={isInviteModalOpen} 
                 onClose={() => setIsInviteModalOpen(false)} 
               />
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">Create Task</span>
+              <button onClick={() => setIsModalOpen(true)}>
+                <span className="hidden sm:inline">Create Task</span>
+              </button>
             </button>
           </div>
         </div>

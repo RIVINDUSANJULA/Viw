@@ -181,6 +181,8 @@ export default function KanbanBoard() {
   const handleDelete = async (taskId: string) => {
     if (!window.confirm("Are you sure you want to delete this task?")) return;
 
+    
+
     setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
 
     try {
@@ -302,7 +304,7 @@ const handleSelectExistingFile = async (taskId: string, fileName: string) => {
           onDragStart={handleDragStart}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
-          onDelete={handleDelete}
+          // onDelete={handleDelete}
 
           onTaskClick={handleTaskClick}
           members={members}
@@ -446,8 +448,7 @@ const handleSelectExistingFile = async (taskId: string, fileName: string) => {
               )}
             </div>
 
-
-            <button>
+            <button onClick={() => handleDelete(selectedTask.id)}>
               <Trash2 className="h-4 w-4" />
               Delete Task
             </button>
