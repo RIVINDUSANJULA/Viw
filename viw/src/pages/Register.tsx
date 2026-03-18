@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { registerAndCreateWorkspace } from '../features/auth/authApi';
 import { Building2, Loader2, Mail, Lock , UserPlus } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 export default function Register() {
 
@@ -19,6 +20,33 @@ export default function Register() {
 
         try {
             await registerAndCreateWorkspace(email, password, workspaceName);
+            
+            
+            const { data: existingTenant, error: checkError } = await supabase
+              .from('tenants')
+              .select('name')
+              .eq('name', workspaceName)
+              .maybeSingle();
+
+            if (checkError) throw new Error("Database error during workspace verification.");
+            if (existingTenant) {
+              throw new Error(`The workspace "${workspaceName}" is already taken. Please try another name.`);
+            }
+
+            const { data: authData, error: authError } = await supabase.auth.signUp({
+              email,
+              password,
+            });
+
+            if (authError) throw authError;
+            const user = authData.user;
+            if (!user) throw new Error("Failed to create user account.");
+
+            const { data: sessionData } = await supabase.auth.getSession();
+            if (!sessionData.session) {
+              throw new Error("Session not established. Go to Supabase -> Authentication -> Providers -> Email, and turn OFF 'Confirm email'.");
+            }
+
             navigate("/projects");
             } 
         catch (err: unknown) { 
@@ -37,7 +65,7 @@ export default function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)] pointer-events-none" />
 
       <div className="relative w-full max-w-md">
 

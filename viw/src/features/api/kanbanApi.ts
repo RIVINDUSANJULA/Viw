@@ -38,7 +38,7 @@ export const fetchColumns = async (tenantId: string) => {
   return data as Column[];
 };
 
-export const fetchTasks = async (tenantId: string) => {
+export const fetchTasks = async () => {
   const { data, error } = await supabase
     .from('tasks')
     .select('* , tenants ( name )')
