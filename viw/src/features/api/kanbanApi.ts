@@ -38,11 +38,11 @@ export const fetchColumns = async (tenantId: string) => {
   return data as Column[];
 };
 
-export const fetchTasks = async () => {
+export const fetchTasks = async (tenantId: string) => {
   const { data, error } = await supabase
     .from('tasks')
     .select('* , tenants ( name )')
-    // .eq('tenant_id', tenantId)
+    .eq('tenant_id', tenantId)
     ;
 
   if (error) throw error;
