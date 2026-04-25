@@ -100,8 +100,12 @@ The application runs on a highly normalized PostgreSQL schema:
 
 ---
 
-## 👤 Author
+## 👨‍💻 Developer & Contact
 
-**Rivindu Sanjula**
-* GitHub: [@RIVINDUSANJULA](https://github.com/RIVINDUSANJULA)
-* GitHub: [@gagana-Perera](http://github.com/gagana-Perera/)
+**System Engineered by [Rivindu Sanjula](https://www.linkedin.com/in/rivindusanjula/)**
+
+I am an active software developer specializing in full-stack web and mobile development, specifically using React, Next.js, Java (Spring Boot), Node.js, and Tailwind CSS. 
+
+🚀 **Open to Work:** I am currently seeking software engineering and cybersecurity opportunities. If you are looking for a dedicated developer to build robust, enterprise-grade applications, let's connect!
+
+📫 **Hire Me / Let's Connect:** [linkedin.com/in/rivindusanjula](https://www.linkedin.com/in/rivindusanjula/)
